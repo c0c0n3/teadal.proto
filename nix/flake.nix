@@ -23,10 +23,11 @@
     let
       ours = pkgs.packages.${prev.system} or {};
       k8s = if nixpkgs.legacyPackages.${prev.system} ? kubernetes then {
-        inherit (nixpkgs.legacyPackages.${prev.system}) kubernetes;
+        k8s = nixpkgs.legacyPackages.${prev.system}.kubernetes;
       } else {};
-    in
-      ours // k8s;
+    in {
+      teadal = ours // k8s;    # NOTE (1)
+    };
 
     modules = {
       nixosModules.imports = [ ./modules ];
@@ -34,3 +35,18 @@
   in
     { inherit overlay; } // pkgs // modules;
 }
+# NOTE
+# ----
+# 1. Infinite recursion. Why not merge our packages right in the top-level
+# set? i.e. the overlay could be
+#
+#   overlay = final: prev:
+#   let
+#     ours = ...;
+#     k8s = ...;
+#   in ours // k8s;
+#
+# This way our packages would be available as e.g. `pkgs.cli-tools-all`
+# instead of `pkgs.teadal.cli-tools-all`. Except that causes Nix to blow
+# up with an infinite recursion error. Gotta love fixed points.
+#

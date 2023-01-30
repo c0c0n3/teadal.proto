@@ -25,9 +25,12 @@ with types;
     # Start from our OS base config, then set up a one-node K8s cluster.
     ext.base = {
       enable = true;
-      cli-tools = [ pkgs.cli-tools-all ];    # NOTE (1)
+      cli-tools = [ pkgs.teadal.cli-tools-all ];    # NOTE (1)
     };
-    ext.k8s.dev-node.enable = true;          # NOTE (1)
+    ext.k8s = {
+      package = pkgs.teadal.k8s;                    # NOTE (1)
+      dev-node.enable = true;
+    };
 
     # Allow remote access through SSH, even for root.
     services.openssh = {
@@ -42,6 +45,6 @@ with types;
 }
 # NOTE
 # ----
-# 1. kubeclt. The `kubernetes` package brings in `kubectl` but it'll be
-# the same version of that installed by `cli-tools-all` b/c it comes from
-# the same nixpkg pin---see `flake.nix`. Not a train smash?
+# 1. kubeclt. The `k8s` package brings in `kubectl` but it'll be the same
+# version of that installed by `cli-tools-all` b/c it comes from the same
+# nixpkg pin---see `flake.nix`. Not a train smash?
