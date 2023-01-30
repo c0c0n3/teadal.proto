@@ -13,7 +13,7 @@ rec {
     # Disk:
     smartmontools du-dust hdparm sdparm parted
     # Network:
-    tcpdump ldns ncat ethtool
+    tcpdump ldns nmap ethtool
     # Commands:
     tree bc lsof lesspipe ripgrep ripgrep-all mkpasswd
     # Compression: (they all work with lesspipe)
