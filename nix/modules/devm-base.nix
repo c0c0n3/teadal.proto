@@ -27,7 +27,7 @@ with types;
       enable = true;
       cli-tools = pkgs.cli-tools-all;    # NOTE (1)
     };
-    ext.k8s.dev-node.enable = true;      # NOTE (1)
+    # ext.k8s.dev-node.enable = true;      # NOTE (1)
 
     # Allow remote access through SSH, even for root.
     services.openssh = {
