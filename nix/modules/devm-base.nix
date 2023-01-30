@@ -25,7 +25,7 @@ with types;
     # Start from our OS base config, then set up a one-node K8s cluster.
     ext.base = {
       enable = true;
-      cli-tools = pkgs.cli-tools-all;    # NOTE (1)
+      cli-tools = [ pkgs.cli-tools-all ];    # NOTE (1)
     };
     # ext.k8s.dev-node.enable = true;      # NOTE (1)
 
