@@ -23,9 +23,9 @@
     let
       ours = pkgs.packages.${prev.system} or {};
       k8s = {};
-      # k8s = if nixpkgs.legacyPackages.${prev.system} ? kubernetes then {
-      #   inherit (nixpkgs.legacyPackages.${prev.system}) kubernetes;
-      # } else {};
+      k8s = if nixpkgs.legacyPackages.${prev.system} ? kubernetes then {
+        inherit (nixpkgs.legacyPackages.${prev.system}) kubernetes;
+      } else {};
     in
       ours // k8s;
 
