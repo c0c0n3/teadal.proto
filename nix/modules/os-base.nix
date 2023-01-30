@@ -2,7 +2,7 @@
 # A simple system base with CLI tools, Emacs and admin user.
 # This module installs:
 #
-# * Emacs
+# * Emacs (built w/o X11 deps)
 # * Bash completion and a given set of CLI tools
 # * Nix Flakes extension
 #
@@ -56,7 +56,7 @@ in {
 
   config = let
     enabled = config.ext.base.enable;
-    tools = ext.base.cli-tools;
+    tools = config.ext.base.cli-tools;
     admin-pwd = config.ext.base.admin-pwd;
     root-pwd = config.ext.base.root-pwd;
   in (mkIf enabled
@@ -69,7 +69,7 @@ in {
 
     # Install Emacs and make it the default editor system-wide.
     # Also install the given CLI toos and enable Bash completion.
-    environment.systemPackages = [ pkgs.emacs ] ++ tools;
+    environment.systemPackages = [ pkgs.emacs-nox ] ++ tools;
     environment.variables = {
       EDITOR = "emacs";    # NOTE (1)
     };
