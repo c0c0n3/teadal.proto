@@ -1,5 +1,6 @@
 #
-# TODO. docs.
+# Kubernetes setups for single-node and multi-node clusters.
+# (Multi-node still in the making...)
 #
 { config, lib, pkgs,... }:
 
@@ -16,6 +17,9 @@ with types;
         Enable it to turn this machine into a single-node K8s cluster.
         This kind setup is only useful for development and testing, never
         to be used in a prod scenario :-)
+
+        Notice that, besides `root`, also members of the `wheel` group
+        have built-in admin access to the cluster through `kubectl`.
       '';
     };
     ext.k8s.package = mkOption {
@@ -30,7 +34,8 @@ with types;
   config = let
     enabled = config.ext.k8s.dev-node.enable;
     k8s = config.ext.k8s.package;
-    # kubeconfig = TODO
+    kubeConfig = "/etc/kubernetes/cluster-admin.kubeconfig";
+    kubeAdminKey = "/var/lib/kubernetes/secrets/cluster-admin-key.pem";
   in (mkIf enabled
   {
     # Install K8s tools---kubectl & friends.
@@ -56,9 +61,18 @@ with types;
         # node port we might use.
         apiserver.extraOpts = "--service-node-port-range=1-65535";
     };
+
+    # Give `wheel` members admin access to the cluster when using `kubectl`.
+    # See NOTE (1) and (2).
     environment.variables = {
-      KUBECONFIG = "/etc/kubernetes/cluster-admin.kubeconfig"; # TODO
+      KUBECONFIG = kubeConfig;
     };
+    system.activationScripts.k8sAdminAccess =
+      stringAfter [ "users" "usrbinenv" ] ''
+        chgrp wheel ${kubeAdminKey}
+        chmod 0640 ${kubeAdminKey}
+      '';
+
   });
 
 }
@@ -77,3 +91,30 @@ with types;
 #
 # See also:
 # - https://github.com/NixOS/nixpkgs/blob/nixos-22.11/nixos/modules/services/cluster/kubernetes/pki.nix
+#
+# 2. Admin access to the K8s cluster. So `root` has admin access to the
+# cluster, but we want our `admin` user to also have it. Now, this is the
+# content of the generated `/etc/kubernetes/cluster-admin.kubeconfig`
+#
+# apiVersion: v1
+# clusters:
+# - cluster:
+#     certificate-authority: "/var/lib/kubernetes/secrets/ca.pem"
+#     server: https://localhost:6443
+#   name: local
+# contexts:
+# - context:
+#     cluster: local
+#     user: cluster-admin
+#   name: local
+# current-context: local
+# kind: Config
+# users:
+# - name: cluster-admin
+#   user:
+#     client-certificate: "/var/lib/kubernetes/secrets/cluster-admin.pem"
+#     client-key: "/var/lib/kubernetes/secrets/cluster-admin-key.pem"
+#
+# Both `ca.pem` and `cluster-admin.pem` are world-readable, but (rightly
+# so) no one except for `root` can read `cluster-admin-key.pem`. So we
+# need `wheel` members to be able to read this file too.
