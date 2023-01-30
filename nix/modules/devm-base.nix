@@ -29,8 +29,11 @@ with types;
     };
     ext.k8s.dev-node.enable = true;      # NOTE (1)
 
-    # Allow remote access through SSH.
-    services.openssh.enable = true;
+    # Allow remote access through SSH, even for root.
+    services.openssh = {
+      enable = true;
+      permitRootLogin = "yes";
+    };
 
     # Get rid of the firewall.
     networking.firewall.enable = false;
