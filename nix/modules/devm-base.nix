@@ -9,7 +9,7 @@ with types;
 {
 
   options = {
-    ext.devm.enable = mkOption {
+    teadal.devm.enable = mkOption {
       type = bool;
       default = false;
       description = ''
@@ -19,15 +19,15 @@ with types;
   };
 
   config = let
-    enabled = config.ext.devm.enable;
+    enabled = config.teadal.devm.enable;
   in (mkIf enabled
   {
     # Start from our OS base config, then set up a one-node K8s cluster.
-    ext.base = {
+    teadal.base = {
       enable = true;
       cli-tools = [ pkgs.teadal.cli-tools-all ];    # NOTE (1)
     };
-    ext.k8s = {
+    teadal.k8s = {
       package = pkgs.teadal.k8s;                    # NOTE (1)
       dev-node.enable = true;
     };

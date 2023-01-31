@@ -16,21 +16,21 @@ with types;
 {
 
   options = {
-    ext.swapfile.enable = mkOption {
+    teadal.swapfile.enable = mkOption {
       type = bool;
       default = false;
       description = ''
         Enables using a swap file.
       '';
     };
-    ext.swapfile.pathname = mkOption {
+    teadal.swapfile.pathname = mkOption {
       type = str;
       default = "/swapfile";
       description = ''
         Path to the swap file.
       '';
     };
-    ext.swapfile.size = mkOption {
+    teadal.swapfile.size = mkOption {
       type = int;
       default = 4096;
       description = ''
@@ -40,9 +40,9 @@ with types;
   };
 
   config = let
-    enabled = config.ext.swapfile.enable;
-    file = config.ext.swapfile.pathname;
-    sz = config.ext.swapfile.size;
+    enabled = config.teadal.swapfile.enable;
+    file = config.teadal.swapfile.pathname;
+    sz = config.teadal.swapfile.size;
   in
   {
 

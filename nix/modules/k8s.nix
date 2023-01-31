@@ -10,7 +10,7 @@ with types;
 {
 
   options = {
-    ext.k8s.dev-node.enable = mkOption {
+    teadal.k8s.dev-node.enable = mkOption {
       type = bool;
       default = false;
       description = ''
@@ -22,7 +22,7 @@ with types;
         have built-in admin access to the cluster through `kubectl`.
       '';
     };
-    ext.k8s.package = mkOption {
+    teadal.k8s.package = mkOption {
       type = package;
       default = pkgs.kubernetes;
       description = ''
@@ -32,8 +32,8 @@ with types;
   };
 
   config = let
-    enabled = config.ext.k8s.dev-node.enable;
-    k8s = config.ext.k8s.package;
+    enabled = config.teadal.k8s.dev-node.enable;
+    k8s = config.teadal.k8s.package;
     kubeConfig = "/etc/kubernetes/cluster-admin.kubeconfig";
     kubeAdminKey = "/var/lib/kubernetes/secrets/cluster-admin-key.pem";
   in (mkIf enabled
