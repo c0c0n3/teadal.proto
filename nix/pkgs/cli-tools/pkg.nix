@@ -31,6 +31,7 @@ rec {
     kustomize         # 4.5.4
     kubernetes-helm   # 3.11.0
     qemu              # 7.2.0
+    nixos-rebuild
   ];
 
   # Bundle all the given programs in a single derivation.
