@@ -26,9 +26,17 @@ look like at the moment.
 - [Bootstrapping a cluster node][node]. How you'd set up a K8s node
   in an actual multi-node cluster.
 
+Keep in mind we could streamline these procedures even more if we
+built custom NixOS images-see [#3][gh#3]. In that case, you'd be
+able to bootstrap a fully-fledged node in three simple steps: boot
+the image, partition the storage, run `nixos-install`. If we go down
+that road, then we can also build AWS, GCE, etc. images basically at
+no additional dev cost.
 
 
 
+
+[gh#3]: https://github.com/c0c0n3/teadal.proto/issues/3
 [nix]: https://nixos.org/
 [nix-explore]: https://nixos.org/explore.html
 [node]: ./node.md
