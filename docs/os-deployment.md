@@ -90,9 +90,9 @@ file. Sweet!
 While `nixos-rebuild` already goes a long way, there's other tools
 we could leverage to manage a cloud of NixOS machines:
 
-- [NixOps][nixops]: https://github.com/NixOS/nixops
-- [Colmena][colmena]: https://github.com/zhaofengli/colmena
-- [morph][morph]: https://github.com/DBCDK/morph
+- [NixOps][nixops]
+- [Colmena][colmena]
+- [morph][morph]
 
 These tools can be a life-saver for complex cloud deployments with
 dozens of machines where you want everything automated, audited and
