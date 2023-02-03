@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- base.yaml
+
+
+# NOTE
+# ----
+# 1. Direct PV. We generated the initial YAML file by running:
+#
+# $ cd nix && nix shell
+# $ kubectl directpv install --dry-run --image 'directpv:v3.2.2' > base.yaml
+#
+# Notice the Docker image version you specify above should be the
+# same as that of the `kubectl-directpv` tool in the Nix shell.
+# See also:
+# - https://github.com/minio/directpv/blob/master/docs/installation.md
+# - https://github.com/minio/directpv/blob/master/docs/cli.md
