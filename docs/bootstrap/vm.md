@@ -21,6 +21,8 @@ a NixOS machine having
   `journalctl`, etc.
 - Broadened K8s node port range. So you'll be able to expose any
   K8s node port you might use.
+- Privileged K8s containers. apiserver will happily spawn privileged
+  containers for you.
 - No firewall. You can turn it on if you really want it, but most
   likely it's not needed for a dev box?
 - Tools for K8s stack dev & ops: `kubectl`, `istioctl`, `argocd`

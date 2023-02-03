@@ -58,8 +58,9 @@ with types;
         kubelet.extraOpts = "--fail-swap-on=false";
 
         # Broaden K8s node port range. So we'll be able to expose any K8s
-        # node port we might use.
-        apiserver.extraOpts = "--service-node-port-range=1-65535";
+        # node port we might use. Plus allow privileged containers to run.
+        apiserver.extraOpts = "--service-node-port-range=1-65535" +
+          " --allow-privileged=true";
     };
 
     # Give `wheel` members admin access to the cluster when using `kubectl`.
