@@ -9,15 +9,19 @@
       url = "github:c0c0n3/nixie";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    gomod2nix = {
+      url = "github:nix-community/gomod2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixos, nixpkgs, nixie }:
+  outputs = { self, nixos, nixpkgs, nixie, gomod2nix }:
   let
-    build = nixie.lib.flakes.mkOutputSetByCartProdForCoreSystems nixpkgs;
-    cli-tools = import ./pkgs/cli-tools/mkSysOutput.nix;
-    # TODO directpv = import ./pkgs/directpv/mkSysOutput.nix;
-
-    pkgs = build [ cli-tools ]; # TODO directpv ];
+    inputPkgs = nixpkgs // {
+      mkOverlays = system: [ gomod2nix.overlays.default ];
+    };
+    build = nixie.lib.flakes.mkOutputSetForCoreSystems inputPkgs;
+    pkgs = build (import ./pkgs/mkSysOutput.nix);
 
     overlay = final: prev:
     let
