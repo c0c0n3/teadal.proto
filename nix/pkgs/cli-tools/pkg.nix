@@ -34,7 +34,6 @@ rec {
 
   # Tools for K8s DevOps to be installed on every cluster node.
   node-cloud = [      # version (pkgs = nixos-unstable branch on 19 Jan 2023)
-    kubectl           # 1.26.0
     kubectl-directpv  # 3.2.2
     istioctl          # 1.16.1
     argocd            # 2.5.6
@@ -46,6 +45,7 @@ rec {
   # Tools for K8s stack dev & ops to be installed in dev shells.
   dev = [             # version (pkgs = nixos-unstable branch on 19 Jan 2023)
     git               # 2.39.0
+    kubectl           # 1.26.0
     kustomize         # 4.5.4
     kubernetes-helm   # 3.11.0
     qemu              # 7.2.0

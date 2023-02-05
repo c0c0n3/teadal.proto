@@ -25,10 +25,10 @@ with types;
     # Start from our OS base config, then set up a one-node K8s cluster.
     teadal.base = {
       enable = true;
-      cli-tools = [ pkgs.teadal.cli-tools-node ];    # NOTE (1)
+      cli-tools = [ pkgs.teadal.cli-tools-node ];
     };
     teadal.k8s = {
-      package = pkgs.teadal.k8s;                     # NOTE (1)
+      package = pkgs.teadal.k8s;
       dev-node.enable = true;
     };
 
@@ -43,8 +43,3 @@ with types;
   });
 
 }
-# NOTE
-# ----
-# 1. kubeclt. The `k8s` package brings in `kubectl` but it'll be the same
-# version of that installed by `cli-tools-node` b/c it comes from the same
-# nixpkg pin---see `flake.nix`. Not a train smash?
