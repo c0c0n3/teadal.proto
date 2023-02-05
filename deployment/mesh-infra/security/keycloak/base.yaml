@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+  labels:
+    app: keycloak
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: keycloak
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: default
+  labels:
+    app: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+      - name: keycloak
+        image: quay.io/keycloak/keycloak:16.1.0
+        env:
+        - name: PROXY_ADDRESS_FORWARDING
+          value: "true"
+        # NOTE this initial admin can only be used on first boot.
+        # In fact, Keycloak will create it in its DB only if it isn't
+        # there already. So the second time this pod restarts the user
+        # will be there and changing the password through the below env
+        # var will have no effect---you'll have to log onto Keycloak to
+        # change it. This is why we're not asking Reloader to monitor
+        # changes to this pod's linked secret.
+        - name: KEYCLOAK_USER
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-builtin-admin
+              key: username
+        - name: KEYCLOAK_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-builtin-admin
+              key: password
+        - name: DB_VENDOR
+          value: "h2"
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: https
+          containerPort: 8443
+        readinessProbe:
+          httpGet:
+            path: /auth/realms/master
+            port: 8080
+        volumeMounts:
+        - name: h2-volume
+          mountPath: /opt/jboss/keycloak/standalone/data
+      volumes:
+      - name: h2-volume
+        persistentVolumeClaim:
+          claimName: keycloak-pvc

@@ -1,0 +1,134 @@
+#
+# Reloader manifests adapted from their v1.0.3 release to:
+#
+# * Get rid of all the Helm-related stuff. Doesn't work with Kustomize.
+# * Deploy to `kube-system` instead of the default namespace. Works out
+#   permission issues where Reloader can't access the configMap and
+#   secrets K8s API endpoints.
+#
+# Original source:
+# - https://github.com/stakater/Reloader/blob/v1.0.3/deployments/kubernetes/reloader.yaml
+#
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: reloader
+  name: reloader
+  namespace: kube-system
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: reloader
+  name: reloader-role
+  namespace: kube-system
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+      - configmaps
+    verbs:
+      - list
+      - get
+      - watch
+  - apiGroups:
+      - "apps"
+    resources:
+      - deployments
+      - daemonsets
+      - statefulsets
+    verbs:
+      - list
+      - get
+      - update
+      - patch
+  - apiGroups:
+      - "extensions"
+    resources:
+      - deployments
+      - daemonsets
+    verbs:
+      - list
+      - get
+      - update
+      - patch
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: reloader
+  name: reloader-role-binding
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: reloader-role
+subjects:
+  - kind: ServiceAccount
+    name: reloader
+    namespace: kube-system
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: reloader
+  name: reloader
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reloader
+  template:
+    metadata:
+      labels:
+        app: reloader
+    spec:
+      containers:
+      - image: "stakater/reloader:v1.0.3"
+        imagePullPolicy: IfNotPresent
+        name: reloader
+
+        ports:
+        - name: http
+          containerPort: 9091
+        - name: metrics
+          containerPort: 9090
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: http
+          timeoutSeconds: 5
+          failureThreshold: 5
+          periodSeconds: 10
+          successThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: metrics
+          timeoutSeconds: 5
+          failureThreshold: 5
+          periodSeconds: 10
+          successThreshold: 1
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: reloader
