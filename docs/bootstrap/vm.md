@@ -102,12 +102,10 @@ $ parted -a optimal /dev/sda
 (parted)  q                          # quit
 ```
 
-Now format the partitions with ext4.
+Now format the boot/OS partition with ext4.
 
 ```bash
 $ mkfs.ext4 -L nixos /dev/sda1
-$ mkfs.ext4 -L directpv-1 /dev/sda2
-$ mkfs.ext4 -L directpv-2 /dev/sda3
 ```
 
 #### Installing a bare-bones NixOS
