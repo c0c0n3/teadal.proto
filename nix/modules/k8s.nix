@@ -57,10 +57,28 @@ with types;
         # - https://kubernetes.io/blog/2021/08/09/run-nodes-with-swap-alpha/
         kubelet.extraOpts = "--fail-swap-on=false";
 
-        # Broaden K8s node port range. So we'll be able to expose any K8s
-        # node port we might use. Plus allow privileged containers to run.
-        apiserver.extraOpts = "--service-node-port-range=1-65535" +
-          " --allow-privileged=true";
+        # Extra tweaks.
+        # - Broaden K8s node port range. So we'll be able to expose
+        #   any K8s node port we might use.
+        # - Allow privileged containers to run.
+        # - Enable all default admission plugins. (NixOS only enables
+        #   a subset of them.)
+        apiserver = {
+          allowPrivileged = true;
+          extraOpts = "--service-node-port-range=1-65535";
+          enableAdmissionPlugins = [
+            "NamespaceLifecycle" "LimitRanger" "ServiceAccount"
+            "TaintNodesByCondition" "PodSecurity" "Priority"
+            "DefaultTolerationSeconds" "DefaultStorageClass"
+            "StorageObjectInUseProtection" "PersistentVolumeClaimResize"
+            "RuntimeClass" "CertificateApproval" "CertificateSigning"
+            "CertificateSubjectRestriction" "DefaultIngressClass"
+            "MutatingAdmissionWebhook" "ValidatingAdmissionWebhook"
+            "ResourceQuota"
+          ];
+          # ^ Got this list by running:
+          # kube-apiserver -h | grep enable-admission-plugins
+        };
     };
 
     # Give `wheel` members admin access to the cluster when using `kubectl`.
