@@ -76,8 +76,15 @@ $ ssh admin@localhost -p 10022
 ```
 
 Then copy over the referenced key files to your local `k8s` dir,
-keeping the same file names. Finally, create a `config.yaml` file
-with this content
+keeping the same file names. e.g.
+
+```bash
+$ scp -P 10022 admin@localhost:/var/lib/kubernetes/secrets/ca.pem ./
+$ scp -P 10022 admin@localhost:/var/lib/kubernetes/secrets/cluster-admin.pem ./
+$ scp -P 10022 admin@localhost:/var/lib/kubernetes/secrets/cluster-admin-key.pem ./
+```
+
+Finally, create a `config.yaml` file with this content
 
 ```yaml
 apiVersion: v1

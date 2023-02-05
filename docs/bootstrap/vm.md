@@ -178,6 +178,13 @@ $ nixos-rebuild switch --flake .#devm
 
 There might be some transient errors with some of the K8s services
 right after installation, but they should go away after a reboot.
+Also, after rebooting run
+
+```bash
+$ nix-collect-garbage -d
+```
+
+to get rid of unused packages in the Nix store and save disk space.
 
 
 ### Sanity check
