@@ -20,6 +20,18 @@ spec:
         host: argocd-server.argocd.svc.cluster.local
         port:
           number: 80
+  - match:  # NOTE (1)
+    - uri:
+        prefix: /httpbin/
+    - uri:
+        prefix: /httpbin
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: httpbin.default.svc.cluster.local
+        port:
+          number: 8000
   - match:  # NOTE (2)
     - uri:
         prefix: /auth
