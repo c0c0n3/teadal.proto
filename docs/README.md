@@ -20,13 +20,19 @@ Here's some initial dev notes to explain part of what's been done.
 - [Dev env][dev-env]. Setting up basic tools to develop and manage
   the Teadal cluster. One-liner install with a virtual env that doesn't
   mess up your box.
-- Teadal cloud bootstrap. Setting up Argo CD pipelines to deploy and
-  manage the Teadal cloud services and supporting K8s resources.
+- [Multipass VM][multipass]. Alternative VM setup with no Nix in
+  sight. You can also use this as a dev env or as a baseline to
+  install MicroK8s on Ubuntu.
+- [Teadal cloud bootstrap][cloud]. Setting up the Istio mesh and the
+  Argo CD pipelines to deploy and manage the Teadal cloud services
+  and supporting K8s resources.
 
 
 
 
 [admin-access]: ./cluster-admin-access.md
 [bootstrap]: ./bootstrap/README.md
+[cloud]: ./bootstrap/cloud.md
 [dev-env]: ./dev-env.md
+[multipass]: ./bootstrap/multipass.md
 [os-depl]: ./os-deployment.md
