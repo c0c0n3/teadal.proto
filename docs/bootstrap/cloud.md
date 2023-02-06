@@ -122,9 +122,7 @@ chasing its own tail, but it works. So we can just build the YAML to
 deploy Argo CD and connect it to our repo like this
 
 ```bash
-$ kustomize build \
-    https://github.com/c0c0n3/teadal.proto/deployment/mesh-infra/argocd | \
-    kubectl apply -f -
+$ kustomize build mesh-infra/argocd | kubectl apply -f -
 ```
 
 After deploying itself to the cluster, Argo CD will populate it with
