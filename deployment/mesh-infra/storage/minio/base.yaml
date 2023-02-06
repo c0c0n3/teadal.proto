@@ -1,0 +1,77 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: minio
+  labels:
+    app: minio
+spec:
+  selector:
+    app: minio
+  ports:
+    - name: minio
+      port: 9000
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio
+  labels:
+    app: minio
+  annotations:
+    # Tell Reloader to bounce MinIO whenever its credentials change.
+    secret.reloader.stakater.com/reload: "minio"
+spec:
+  serviceName: "minio"
+  replicas: 4
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+        direct.csi.min.io/organization: minio
+        direct.csi.min.io/app: minio-example
+        direct.csi.min.io/tenant: tenant-1
+    spec:
+      containers:
+      - name: minio
+        image: minio/minio
+        env:
+        - name: MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio
+              key: minio.access-key
+        - name: MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio
+              key: minio.secret-key
+        volumeMounts:
+        - name: minio-data-1
+          mountPath: /data1
+        - name: minio-data-2
+          mountPath: /data2
+        - name: minio-data-3
+          mountPath: /data3
+        - name: minio-data-4
+          mountPath: /data4
+        args:
+        - "server"
+        - "http://minio-{0...3}.minio.default.svc.cluster.local:9000/data{1...4}"
+      volumes:
+      - name: minio-data-1
+        persistentVolumeClaim:
+          claimName: minio-data-1-pvc
+      - name: minio-data-2
+        persistentVolumeClaim:
+          claimName: minio-data-2-pvc
+      - name: minio-data-3
+        persistentVolumeClaim:
+          claimName: minio-data-3-pvc
+      - name: minio-data-4
+        persistentVolumeClaim:
+          claimName: minio-data-4-pvc
