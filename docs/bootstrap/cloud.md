@@ -73,17 +73,6 @@ kubectl apply -f mesh-infra/storage/pv/devm.yaml
 kustomize build mesh-infra/storage/ | kubectl apply -f -
 
 
-### Secrets
-
-Edit the K8s Secret templates in `mesh-infra/security/secrets` to
-enter the passwords you'd like to use. Then install them in the cluster
-
-```bash
-$ kubectl create namespace argocd
-$ kustomize build mesh-infra/security/secrets | kubectl apply -f -
-```
-
-
 ### Istio
 
 Deploy Istio to the cluster using our own profile
@@ -135,3 +124,31 @@ Go for coffee.
   the output, rerun the above command again — see [#42][boot.argo-app-issue]
   about it.
   > unable to recognize "STDIN": no matches for kind "AppProject" in version "argoproj.io/v1alpha1"
+
+
+### Secrets
+
+Edit the K8s Secret templates in `mesh-infra/security/secrets` to
+enter the passwords you'd like to use. Then install them in the cluster
+
+```bash
+$ kustomize build mesh-infra/security/secrets | kubectl apply -f -
+```
+
+Notice that Argo CD creates an initial secret with an admin user of
+`admin` and randomly generated password on the first deployment. To
+grab that password, run
+
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret \
+        -o jsonpath="{.data.password}" | base64 -d && echo
+```
+
+You can use it if you get in trouble during the bootstrap procedure,
+but keeping it around is like an accident waiting to happen. So you
+should definitely zap it as soon as you've managed to log into Argo
+CD with the password you entered in our secret. To do that, just
+
+```bash
+$ kubectl -n argocd delete secret argocd-initial-admin-secret
+```
