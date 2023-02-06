@@ -6,6 +6,7 @@
 # - added nodePort 80 and 443 to make the ingress gateway accept external
 #   HTTP and HTTPS traffic from those ports, since we're not using an
 #   external load balancer.
+# - added nodePort 5432 for Postgres---possibly to be removed after demo.
 #
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
@@ -52,6 +53,10 @@ spec:
               nodePort: 443
               targetPort: 8443
               name: https
+            - port: 5432
+              nodePort: 5432
+              targetPort: 5432
+              name: postgres
             - port: 31400
               targetPort: 31400
               name: tcp

@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: "tcp-virtual-service"
+spec:
+  gateways:
+  - "teadal-gateway"
+  hosts:
+  - "*"
+  tcp:
+  - match:
+    - port: 5432
+    route:
+    - destination:
+        host: postgres.default.svc.cluster.local
+        port:
+          number: 5432
