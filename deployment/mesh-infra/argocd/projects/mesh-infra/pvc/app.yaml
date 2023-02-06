@@ -1,0 +1,6 @@
+- op: replace
+  path: /metadata/name
+  value: pvc
+- op: replace
+  path: /spec/source/path
+  value: deployment/mesh-infra/storage/pvc

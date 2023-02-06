@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app
+  namespace: argocd
+spec:
+  project: mesh-infra
+  source:
+    repoURL: https://github.com/c0c0n3/teadal.proto
+    targetRevision: HEAD
+    path: deployment/mesh-infra/app
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    # Automated sync with retries. Max of 5 failed attempts spaced out
+    # by 5s, 10s, 20s, 40s, and 80s. See retry stanza below.
+    automated:
+      # Don't try fixing apps when resources changed only in the cluster
+      # but not in git.
+      selfHeal: false
+    syncOptions:
+    # Make sure the app destination namespace exists in the cluster.
+    - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s     # base amount to back off
+        factor: 2        # factor to multiply base after each failed retry
+        maxDuration: 3m  # maximum time allowed for the backoff strategy

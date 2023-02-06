@@ -1,0 +1,49 @@
+# See
+# - https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/
+# - https://github.com/argoproj/argo-cd/blob/v2.5.6/docs/operator-manual/argocd-cmd-params-cm.yaml
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cmd-params-cm
+  labels:
+    app.kubernetes.io/name: argocd-cmd-params-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  # Make Argo CD UI available at `<host>/argocd` from outside the cluster.
+  # To do that, we've got to set the base URL but **not** the root path.
+  # See:
+  # - https://argo-cd.readthedocs.io/en/stable/operator-manual/ingress
+  # - NOTE (1)
+  server.basehref: "/argocd"
+
+  # Run Argo CD Server without TLS. We do this because Istio handles TLS
+  # termination and mutual TLS among mesh services.
+  server.insecure: "true"
+
+  # Disable client authentication
+  # server.disable.auth: "true"
+
+  # Set the log level to one of: debug|info|warn|error.
+  server.log.level: "debug"
+
+# NOTE
+# 1. Path-based routing. Setting `basehref = /argocd` tells the Argo CD
+# JavaScript App (running in the browser) to prepend API call URLs with
+# `/argocd`. Then Istio routing rewrites `/argocd/foo/bar` to `/foo/bar`.
+# Notice in principle Istio routing wouldn't be needed if we were able
+# to set Argo CD Server's root path. But if you try adding this to our
+# config (with or without `server.basehref: "/argocd"`)
+#
+#   server.rootpath: "/argocd"
+#
+# and disable Istio routing, you'll be able to navigate to the login
+# page (plain login with the Argo CD admin user, no SSO) at `<host>/argocd`
+# but then for some odd reason you won't be able to get past it, even if
+# you enter valid credentials. If you look under the bonnet, you'll see
+# the UI making HTTP calls to the Argo CD API at `/argocd/api/v1/applications`
+# and `/argocd/api/v1/clusters` but the server returns `401 Unauthorized`.
+# I thought it had to do with our Istio routing and security rules, but
+# then I got the exact same problem when using plain K8s port forwarding.
+# An Argo CD bug?
+#

@@ -1,0 +1,9 @@
+- op: replace
+  path: /metadata/name
+  value: httpbin
+- op: replace
+  path: /spec/source/path
+  value: deployment/plat-app-services/httpbin
+- op: replace
+  path: /spec/project
+  value: plat-app-services

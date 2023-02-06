@@ -1,0 +1,6 @@
+- op: replace
+  path: /metadata/name
+  value: grafana
+- op: replace
+  path: /spec/source/path
+  value: deployment/mesh-infra/istio/grafana

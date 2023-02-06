@@ -1,0 +1,6 @@
+- op: replace
+  path: /metadata/name
+  value: argocd
+- op: replace
+  path: /spec/source/path
+  value: deployment/mesh-infra/argocd

@@ -1,0 +1,8 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-server
+  annotations:
+    # Tell Reloader to bounce the Argo CD server whenever the SSO config
+    # and built-in admin credentials change.
+    secret.reloader.stakater.com/reload: "argocd-secret"

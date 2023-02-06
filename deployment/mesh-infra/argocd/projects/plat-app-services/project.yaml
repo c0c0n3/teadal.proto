@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: plat-app-services
+  namespace: argocd
+  # Make sure the project can only be deleted if no app references it.
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Teadal platform application services
+  # Allow manifests to deploy from any Git repos.
+  sourceRepos:
+  - '*'
+  # Allow manifests to deploy to any namespace in the local cluster.
+  destinations:
+  - namespace: '*'
+    server: https://kubernetes.default.svc
+  # Allow manifests to deploy any kind of resource.
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  # Allow manifests to fillde with any namespace.
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'

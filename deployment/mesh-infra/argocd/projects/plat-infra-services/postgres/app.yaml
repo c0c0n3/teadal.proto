@@ -1,0 +1,9 @@
+- op: replace
+  path: /metadata/name
+  value: postgres
+- op: replace
+  path: /spec/source/path
+  value: deployment/plat-infra-services/postgres
+- op: replace
+  path: /spec/project
+  value: plat-infra-services
