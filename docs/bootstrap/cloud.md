@@ -15,7 +15,7 @@ and "Local storage instead of DirectPV" sections below.
 
 ### Setting the stage
 
-You should have a K8s `1.25` cluster up and running and a shell with
+You should have a K8s `1.27` cluster up and running and a shell with
 a `KUBECONFIG` env var pointing to the admin creds for your cluster.
 
 The commands in the sections below assume you have

@@ -49,7 +49,7 @@ metal. In fact, that's what we do in the examples below.
 ### NixOS installation
 
 #### Booting the ISO image
-Download the NixOS 22.11 image and boot it on the designated victim,
+Download the NixOS 23.05 image and boot it on the designated victim,
 i.e. your target installation machine. How to do that exactly depends
 on your hardware—have a look at the NixOS manual for the details. For
 the sake of having a concrete example, we use Qemu—[our Nix shell][dev-env]
@@ -66,7 +66,7 @@ Then make Qemu boot from the NixOS ISO image file
 
 ```bash
 $ qemu-system-x86_64 \
-    -cdrom nixos-minimal-22.11.1895.ab1254087f4-x86_64-linux.iso \
+    -cdrom nixos-minimal-23.05.1156.ad157fe26e7-x86_64-linux.iso \
     -drive "file=devm.img.qcow2,format=qcow2" \
     -machine q35,vmport=off -cpu host -smp 2 -m 4G -accel hvf
 ```

@@ -5,13 +5,14 @@ Dev env
 At the moment, we're using some basic tools to develop and manage
 the Teadal cluster. Names & versions below.
 
-* git `2.39.0`
-* kubectl `1.26.0`
-* istioctl `1.16.1`
-* argocd `2.5.6`
-* kustomize `4.5.4`
-* kubernetes-helm `3.11.0`
-* qemu `7.2.0`
+* git `2.40.1`
+* kubectl `1.27.1`
+* kubectl-directpv `4.0.5`
+* istioctl `1.17.2`
+* argocd `2.7.2`
+* kustomize `5.0.3`
+* kubernetes-helm `3.11.3`
+* qemu `8.0.0`
 
 Please, like please, install the exact versions and if you do have
 some of those tools already, make sure to always get a shell where
