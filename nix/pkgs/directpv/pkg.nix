@@ -3,8 +3,8 @@
   buildGoApplication, gomod2nix
 }:
 let
-  gitTag = "v4.0.5";                                          # NOTE (1)
-  pkgVer = "4.0.5";
+  gitTag = "v4.0.6";                                          # NOTE (1)
+  pkgVer = "4.0.6";
 in buildGoApplication {
   pname = "kubectl-directpv";
   version = pkgVer;
@@ -12,7 +12,7 @@ in buildGoApplication {
     owner = "minio";
     repo = "directpv";
     rev = gitTag;
-    sha256 = "sha256-0pPs2VCNWdmiEZyaqXIcYsk/o7bHsBWsZURFyOuuna8=";
+    sha256 = "sha256-/+UXSK3u54ij0k1HdCY6p2kNgEVbErfOIDSHng2HDUo=";
   };
   subPackages = [ "cmd/kubectl-directpv" ];
   modules = ./gomod2nix.toml;
@@ -38,7 +38,7 @@ in buildGoApplication {
 # 3. Build flags. To figure out what to do, look at their `build.sh` and
 # `.github/workflows/build.yaml` scripts. Also notice there's a code gen
 # script (`codegen.sh`) that `build.sh` calls, but, luckly, we don't need
-# to run it b/c at tag `v4.0.5` all the files this script generates are in
+# to run it b/c at tag `v4.0.6` all the files this script generates are in
 # git already. In fact, if you run yourself the script with the exact same
 # versions of the Go tools in the script, you'll see that the generated
 # files are the same as those in source control.
