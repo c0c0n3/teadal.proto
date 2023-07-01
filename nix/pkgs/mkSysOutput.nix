@@ -16,7 +16,14 @@ let
   # It takes a set as an argument though...
 
   kubectl-directpv = sysPkgs.callPackage ./directpv/pkg.nix { };
-  kubectl-minio = sysPkgs.callPackage ./kubectl-minio/pkg.nix { };
+
+  # Install kubectl-minio's GitHub binary release as is.
+  kubectl-minio = sysPkgs.callPackage ./kubectl-minio/pkg-bin.nix {
+    inherit system;
+  };
+  # If you'd rather build from source, use this expression instead:
+  # kubectl-minio = sysPkgs.callPackage ./kubectl-minio/pkg.nix { };
+
   tools = sysPkgs.callPackage ./cli-tools/pkg.nix {
     inherit kubectl-directpv kubectl-minio;
   };
@@ -27,3 +34,9 @@ in rec {
     { inherit kubectl-directpv kubectl-minio; };
   defaultPackage.${system} = tools.shared.cli-tools-dev-shell;
 }
+# NOTE
+# ----
+# 1. Binary packages. We don't build those ones from source b/c the
+# binaries released on GitHub are statically linked. So we can just
+# download them and install them which is much quicker. But you can
+# still build from source with the `pkg.nix` expression if you like.
