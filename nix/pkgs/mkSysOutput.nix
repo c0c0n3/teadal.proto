@@ -16,11 +16,14 @@ let
   # It takes a set as an argument though...
 
   kubectl-directpv = sysPkgs.callPackage ./directpv/pkg.nix { };
-  tools = sysPkgs.callPackage ./cli-tools/pkg.nix { inherit kubectl-directpv; };
+  kubectl-minio = sysPkgs.callPackage ./kubectl-minio/pkg.nix { };
+  tools = sysPkgs.callPackage ./cli-tools/pkg.nix {
+    inherit kubectl-directpv kubectl-minio;
+  };
 
 in rec {
   packages.${system} =
     tools.shared // (if isLinux then tools.linux else {}) //
-    { inherit kubectl-directpv; };
+    { inherit kubectl-directpv kubectl-minio; };
   defaultPackage.${system} = tools.shared.cli-tools-dev-shell;
 }

@@ -8,6 +8,7 @@ the Teadal cluster. Names & versions below.
 * git `2.40.1`
 * kubectl `1.27.1`
 * kubectl-directpv `4.0.6`
+* kubectl-minio `5.0.6`
 * istioctl `1.17.2`
 * argocd `2.7.2`
 * kustomize `5.0.3`
