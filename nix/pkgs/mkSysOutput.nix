@@ -15,9 +15,14 @@ let
   # TODO use nixpkgs.lib.systems.inspect.predicates.isLinux?
   # It takes a set as an argument though...
 
-  kubectl-directpv = sysPkgs.callPackage ./kubectl-directpv/pkg.nix { };
+  # Install kubectl-directpv's GitHub binary release as is.    # NOTE (1)
+  kubectl-directpv = sysPkgs.callPackage ./kubectl-directpv/pkg-bin.nix {
+    inherit system;
+  };
+  # If you'd rather build from source, use this expression instead:
+  # kubectl-directpv = sysPkgs.callPackage ./kubectl-directpv/pkg.nix { };
 
-  # Install kubectl-minio's GitHub binary release as is.
+  # Install kubectl-minio's GitHub binary release as is.       # NOTE (1)
   kubectl-minio = sysPkgs.callPackage ./kubectl-minio/pkg-bin.nix {
     inherit system;
   };
