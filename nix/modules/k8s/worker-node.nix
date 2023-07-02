@@ -23,6 +23,7 @@ with types;
   in (mkIf enabled
   {
     # Configure a K8s worker node.
+    teadal.k8s.base.enable = true;
     services.kubernetes = {
         roles = [ "node" ];
 

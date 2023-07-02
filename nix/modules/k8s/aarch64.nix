@@ -9,6 +9,13 @@ with types;
 {
 
   options = {
+    teadal.k8s.aarch64.enable = mkOption {
+      type = bool;
+      default = false;
+      description = ''
+        Enable it to make our K8s config run on Aarch64.
+      '';
+    };
     teadal.k8s.aarch64.corednsImg = mkOption {
       description = ''
         Aarch64 CoreDNS Docker image. The default one in Nixpkgs 23.05
@@ -36,9 +43,9 @@ with types;
   };
 
   config = let
-    isAarch64 = pkgs.stdenv.isAarch64;
+    enabled = pkgs.stdenv.isAarch64 && config.teadal.k8s.aarch64.enable;
     corednsImg = config.teadal.k8s.aarch64.corednsImg;
-  in (mkIf isAarch64
+  in (mkIf enabled
   {
     services.kubernetes.addons.dns.coredns = corednsImg;
 

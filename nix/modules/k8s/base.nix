@@ -9,6 +9,13 @@ with types;
 {
 
   options = {
+    teadal.k8s.base.enable = mkOption {
+      type = bool;
+      default = false;
+      description = ''
+        Enable it to install our K8s base config.
+      '';
+    };
     teadal.k8s.package = mkOption {
       type = package;
       default = pkgs.kubernetes;
@@ -19,7 +26,8 @@ with types;
   };
 
   config = let
-    enabled = config.services.kubernetes.roles != [];
+    enabled = config.services.kubernetes.roles != [] &&
+              config.teadal.k8s.base.enable;
   in (mkIf enabled
   {
     # Install K8s tools---kubectl & friends.

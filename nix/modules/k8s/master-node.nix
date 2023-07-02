@@ -26,6 +26,7 @@ with types;
   in (mkIf enabled
   {
     # Configure a K8s master node.
+    teadal.k8s.base.enable = true;
     services.kubernetes = {
         roles = [ "master" ];
 
@@ -41,6 +42,10 @@ with types;
 
     # Give `wheel` members admin access to the cluster when using `kubectl`.
     teadal.k8s.enableAdminAccess = true;
+
+    # Addtional tweaks if running on Aarch64. (Does nothing if the box
+    # isn't Aarch64.)
+    teadal.k8s.aarch64.enable = true;
 
   });
 
