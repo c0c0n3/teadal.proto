@@ -28,6 +28,7 @@ with types;
   config = let
     enabled = config.services.kubernetes.roles != [] &&
               config.teadal.k8s.base.enable;
+    k8s = config.teadal.k8s.package;
   in (mkIf enabled
   {
     # Install K8s tools---kubectl & friends.
