@@ -27,6 +27,10 @@ The commands in the sections below assume you have
 
 ### Direct PV
 
+**TODO**: the steps below won't work w/ the latest DirectPV (4.0.6).
+They worked w/ version 3 but we can't use that version anymore. Put
+together new instructions when you get DirectPV to work w/ K8s 1.27.
+
 Install K8s CRDs, perms, Direct PV controller, node drivers, etc.
 
 ```bash
