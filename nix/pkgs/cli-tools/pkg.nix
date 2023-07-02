@@ -9,7 +9,7 @@
   ripgrep, ripgrep-all, mkpasswd, unzip, zip, aria,
 
   git, kubectl, istioctl, argocd, kustomize, kubernetes-helm,
-  qemu, nixos-rebuild, nixos-option,
+  qemu, nixos-rebuild,
 
   kubectl-directpv, kubectl-minio
 }:
@@ -30,8 +30,6 @@ rec {
     unzip zip
     # Internet:
     aria
-    # NixOS:
-    nixos-option
   ];
 
   # Tools for K8s DevOps to be installed on every cluster node.
