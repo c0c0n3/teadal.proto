@@ -11,7 +11,7 @@
 
 let
 
-  isLinux = (import ./platform.nix).isLinux system;
+  isLinux = sysPkgs.stdenv.isLinux;
 
   # Install kubectl-directpv's GitHub binary release as is.    # NOTE (1)
   kubectl-directpv = sysPkgs.callPackage ./kubectl-directpv/pkg-bin.nix {

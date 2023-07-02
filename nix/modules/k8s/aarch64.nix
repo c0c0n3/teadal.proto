@@ -36,7 +36,7 @@ with types;
   };
 
   config = let
-    isAarch64 = (import ../../pkgs/platform.nix).isAarch64 pkgs.system;
+    isAarch64 = pkgs.stdenv.isAarch64;
     corednsImg = config.teadal.k8s.aarch64.corednsImg;
   in (mkIf isAarch64
   {
