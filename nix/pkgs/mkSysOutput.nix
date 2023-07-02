@@ -11,9 +11,7 @@
 
 let
 
-  isLinux = (builtins.match ".*-linux$" system) != null;
-  # TODO use nixpkgs.lib.systems.inspect.predicates.isLinux?
-  # It takes a set as an argument though...
+  isLinux = (import ./platform.nix).isLinux system;
 
   # Install kubectl-directpv's GitHub binary release as is.    # NOTE (1)
   kubectl-directpv = sysPkgs.callPackage ./kubectl-directpv/pkg-bin.nix {
