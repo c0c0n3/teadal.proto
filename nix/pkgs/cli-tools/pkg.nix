@@ -33,11 +33,11 @@ rec {
   ];
 
   # Tools for K8s DevOps to be installed on every cluster node.
-  node-cloud = [      # version (pkgs = nixos-23.05)
-    kubectl-directpv  # 4.0.6
-    kubectl-minio     # 5.0.6
-    istioctl          # 1.17.2
-    argocd            # 2.7.2
+  node-cloud = [      # version
+    kubectl-directpv  # 4.0.6    (pkgs = nixos-23.05)
+    kubectl-minio     # 5.0.6    (pkgs = nixos-23.05)
+    istioctl          # 1.18.0   (pkgs = nixos-unstable on 01 Jul 2023)
+    argocd            # 2.7.6    (pkgs = nixos-unstable on 01 Jul 2023)
   ];
 
   # Tools to install on every cluster node.

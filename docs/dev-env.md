@@ -9,8 +9,8 @@ the Teadal cluster. Names & versions below.
 * kubectl `1.27.1`
 * kubectl-directpv `4.0.6`
 * kubectl-minio `5.0.6`
-* istioctl `1.17.2`
-* argocd `2.7.2`
+* istioctl `1.18.0`
+* argocd `2.7.6`
 * kustomize `5.0.3`
 * kubernetes-helm `3.11.3`
 * qemu `8.0.0`
