@@ -11,3 +11,13 @@ resources:
 patchesStrategicMerge:
 - argocd-cmd-params-cm.yaml
 - argocd-server.yaml
+
+patches:
+# get rid of the built-in empty Argo CD Secret as we'll be using our own
+# but outside of source control and apply it manually. If we kept the original,
+# Argo CD would override the one we manually configure with the original on
+# every sync.
+- path: exclude-argocd-secret.yaml
+  target:
+    kind: Secret
+    name: argocd-secret
