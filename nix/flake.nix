@@ -29,9 +29,30 @@
     build = nixie.lib.flakes.mkOutputSetForCoreSystems inputPkgs;
     pkgs = build (import ./pkgs/mkSysOutput.nix);
 
+    overlay = final: prev:
+    let
+      ours = pkgs.packages.${prev.system} or {};
+    in {
+      teadal = ours;                                       # NOTE (1)
+    };
+
     modules = {
       nixosModules.imports = [ ./modules ];
     };
   in
-    pkgs // modules;
+    { inherit overlay; } // pkgs // modules;
 }
+# NOTE
+# ----
+# 1. Infinite recursion. Why not merge our packages right in the top-level
+# set? i.e. the overlay could be
+#
+#   overlay = final: prev:
+#   let
+#     ours = ...;
+#     k8s = ...;
+#   in ours // k8s;
+#
+# This way our packages would be available as e.g. `pkgs.cli-tools-all`
+# instead of `pkgs.teadal.cli-tools-all`. Except that causes Nix to blow
+# up with an infinite recursion error. Gotta love fixed points.
