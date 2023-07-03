@@ -1,6 +1,6 @@
 #
 # Copied from:
-# - https://github.com/istio/istio/blob/1.16.1/manifests/profiles/demo.yaml
+# - https://github.com/istio/istio/blob/1.18.0/manifests/profiles/demo.yaml
 #
 # Changed:
 # - added nodePort 80 and 443 to make the ingress gateway accept external
@@ -18,6 +18,14 @@ spec:
       envoyOtelAls:
         service: opentelemetry-collector.istio-system.svc.cluster.local
         port: 4317
+    - name: skywalking
+      skywalking:
+        service: tracing.istio-system.svc.cluster.local
+        port: 11800
+    - name: otel-tracing
+      opentelemetry:
+        port: 4317
+        service: opentelemetry-collector.otel-collector.svc.cluster.local
   components:
     egressGateways:
     - name: istio-egressgateway

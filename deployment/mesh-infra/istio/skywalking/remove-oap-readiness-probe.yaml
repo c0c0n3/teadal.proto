@@ -1,0 +1,2 @@
+- path: /spec/template/spec/containers/0/readinessProbe
+  op: remove
