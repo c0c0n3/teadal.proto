@@ -8,11 +8,15 @@ resources:
 - https://raw.githubusercontent.com/argoproj/argo-cd/v2.7.6/manifests/install.yaml
 - projects
 
-patchesStrategicMerge:
-- argocd-cmd-params-cm.yaml
-- argocd-server.yaml
-
 patches:
+- path: argocd-cmd-params-cm.yaml
+  target:
+    kind: ConfigMap
+    name: argocd-cmd-params-cm
+- path: argocd-server.yaml
+  target:
+    kind: Deployment
+    name: argocd-server
 # get rid of the built-in empty Argo CD Secret as we'll be using our own
 # but outside of source control and apply it manually. If we kept the original,
 # Argo CD would override the one we manually configure with the original on
