@@ -43,6 +43,14 @@ with types;
         addons.dns.enable = true;
 
         # Allow privileged containers to run.
+        # This is convenient for e.g. debugging traffic throuhg Istio sidecars
+        # easily without starting a K8s debug container but not exactly the
+        # best setup security-wise, so we should probably zap this setting in
+        # the future.
+        # See:
+        #   - https://github.com/istio/istio/issues/30982
+        #   - https://kubernetes.io/docs/tasks/debug/debug-application/debug-running-pod/#ephemeral-container
+        #   - https://www.redhat.com/sysadmin/privileged-flag-container-engines
         apiserver.allowPrivileged = true;
 
         # Keep going even if this box has swap memory.

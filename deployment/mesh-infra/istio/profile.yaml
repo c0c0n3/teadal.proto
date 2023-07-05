@@ -7,6 +7,22 @@
 #   HTTP and HTTPS traffic from those ports, since we're not using an
 #   external load balancer.
 # - added nodePort 5432 for Postgres---possibly to be removed after demo.
+# - added `privileged: true` to global proxy config. This way, all sidecars
+#   will run in privileged mode---i.e. Istio configures the sidecar pod with
+#   `securityContext.allowPrivilegeEscalation: true` and
+#   `securityContext.privileged: true`.
+#   We do this to be able to easily debug HTTP calls with tcpdump, e.g.
+#
+#     $ kubectl exec -it svc/keycloak -c istio-proxy -- sh
+#     $ sudo tcpdump -i any -s 1024 -A port 8080
+#
+#   without having to start a K8s debug container. This is convenient but
+#   not exactly the best setup security-wise, so we should probably zap
+#   this setting in the future.
+#   See:
+#   - https://github.com/istio/istio/issues/30982
+#   - https://kubernetes.io/docs/tasks/debug/debug-application/debug-running-pod/#ephemeral-container
+#   - https://www.redhat.com/sysadmin/privileged-flag-container-engines
 #
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
@@ -86,6 +102,7 @@ spec:
   values:
     global:
       proxy:
+        privileged: true
         resources:
           requests:
             cpu: 10m
