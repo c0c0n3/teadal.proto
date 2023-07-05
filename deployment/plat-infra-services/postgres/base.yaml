@@ -36,7 +36,7 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: timescale/timescaledb-postgis:2.3.0-pg13
+        image: postgres:15.3
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5432
