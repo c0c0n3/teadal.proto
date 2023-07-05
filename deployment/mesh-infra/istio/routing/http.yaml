@@ -34,7 +34,7 @@ spec:
           number: 8000
   - match:  # NOTE (2)
     - uri:
-        prefix: /auth
+        prefix: /keycloak
     route:
     - destination:
         host: keycloak.default.svc.cluster.local
@@ -54,7 +54,7 @@ spec:
 # See:
 # - https://github.com/istio/istio/issues/8076
 #
-# 2. Keycloak base path. Keycloak is configured with a `web-context`
-# of `auth`, which makes every URL in the UI is relative to `/auth`.
+# 2. Keycloak base path. Keycloak is configured with an HTTP rel path of
+# `/keycloak`, which makes every URL in the UI is relative to `/keycloak`.
 # So we don't need a rewrite rule in this case.
 #
