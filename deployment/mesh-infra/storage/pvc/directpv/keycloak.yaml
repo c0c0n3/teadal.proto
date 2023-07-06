@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: directpv-min-io
+  resources:
+    requests:
+      storage: 1Gi
