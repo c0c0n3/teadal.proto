@@ -10,10 +10,9 @@ resources:
 # 1. Direct PV. We generated the initial YAML file by running:
 #
 # $ cd nix && nix shell
-# $ kubectl directpv install --dry-run --image 'directpv:v3.2.2' > base.yaml
+# $ kubectl directpv install -o yaml > base.yaml
 #
-# Notice the Docker image version you specify above should be the
-# same as that of the `kubectl-directpv` tool in the Nix shell.
-# See also:
-# - https://github.com/minio/directpv/blob/master/docs/installation.md
-# - https://github.com/minio/directpv/blob/master/docs/cli.md
+# Notice our version of Direct PV (4.0.6) can only generate manifests
+# for x86_84/amd64. This is b/c they pull specific images for those
+# architectures. The `base.arm64.yaml` manifest fixes that by replacing
+# x86_84/amd64 images w/ arm64 ones. Diff the two files.

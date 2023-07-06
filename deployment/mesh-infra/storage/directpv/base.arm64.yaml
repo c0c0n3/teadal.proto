@@ -928,7 +928,8 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: spec.nodeName
-        image: quay.io/minio/csi-node-driver-registrar@sha256:68ee8f0b10acb4189e506d8a0e40c995362d886a35d5cbb17624e59913af0145
+        # image: quay.io/minio/csi-node-driver-registrar@sha256:68ee8f0b10acb4189e506d8a0e40c995362d886a35d5cbb17624e59913af0145
+        image: longhornio/csi-node-driver-registrar:v2.7.0-arm64
         name: node-driver-registrar
         resources: {}
         terminationMessagePath: /var/log/driver-registrar-termination-log
@@ -1064,7 +1065,8 @@ spec:
       - args:
         - --csi-address=/csi/csi.sock
         - --health-port=9898
-        image: quay.io/minio/livenessprobe@sha256:0522eff1d8e9269655080500c1f6388fe2573978e8a74e08beaf3452cd575c2e
+        # image: quay.io/minio/livenessprobe@sha256:0522eff1d8e9269655080500c1f6388fe2573978e8a74e08beaf3452cd575c2e
+        image: longhornio/livenessprobe:v2.9.0-arm64
         name: liveness-probe
         resources: {}
         terminationMessagePath: /var/log/driver-liveness-termination-log
@@ -1162,7 +1164,8 @@ spec:
         env:
         - name: CSI_ENDPOINT
           value: unix:///csi/csi.sock
-        image: quay.io/minio/csi-provisioner@sha256:704fe68a6344774d4d0fde980af64fac2f2ddd27fb2e7f7c5b3d8fbddeae4ec8
+        # image: quay.io/minio/csi-provisioner@sha256:704fe68a6344774d4d0fde980af64fac2f2ddd27fb2e7f7c5b3d8fbddeae4ec8
+        image: longhornio/csi-provisioner:v3.4.1-arm64
         name: csi-provisioner
         resources: {}
         securityContext:
@@ -1181,7 +1184,8 @@ spec:
         env:
         - name: CSI_ENDPOINT
           value: unix:///csi/csi.sock
-        image: quay.io/minio/csi-resizer@sha256:a88ca4a9bfbd2e604aedae5a04a5c180540259e3ab75393755ff73d587a619b2
+        # image: quay.io/minio/csi-resizer@sha256:a88ca4a9bfbd2e604aedae5a04a5c180540259e3ab75393755ff73d587a619b2
+        image: longhornio/csi-resizer:v1.7.0-arm64
         name: csi-resizer
         resources: {}
         securityContext:
