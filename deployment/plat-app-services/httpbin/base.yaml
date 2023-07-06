@@ -31,7 +31,10 @@ spec:
         app: httpbin
     spec:
       containers:
-      - image: docker.io/kennethreitz/httpbin
+      # - image: docker.io/kennethreitz/httpbin
+      # ^ the official image only works on x86_64 whereas the one below is
+      # multi-arch, supporting both x86_64 and arm64.
+      - image: quay.io/pflaeging/httpbin:0.9.2
         imagePullPolicy: IfNotPresent
         name: httpbin
         ports:

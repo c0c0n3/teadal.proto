@@ -6,12 +6,11 @@
   ];
 
   boot.loader.grub.enable = true;
-  boot.loader.grub.version = 2;
   boot.loader.grub.device = "/dev/sda";
 
   networking.hostName = "devm";
   time.timeZone = "Europe/Amsterdam";
-  system.stateVersion = "22.11";
+  system.stateVersion = "23.05";
 
   # services.qemuGuest.enable = true;
   teadal.devm.enable = true;

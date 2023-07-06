@@ -11,7 +11,7 @@
   git, kubectl, istioctl, argocd, kustomize, kubernetes-helm,
   qemu, nixos-rebuild,
 
-  kubectl-directpv
+  kubectl-directpv, kubectl-minio
 }:
 
 rec {
@@ -33,22 +33,23 @@ rec {
   ];
 
   # Tools for K8s DevOps to be installed on every cluster node.
-  node-cloud = [      # version (pkgs = nixos-unstable branch on 19 Jan 2023)
-    kubectl-directpv  # 3.2.2
-    istioctl          # 1.16.1
-    argocd            # 2.5.6
+  node-cloud = [      # version
+    kubectl-directpv  # 4.0.6    (pkgs = nixos-23.05)
+    kubectl-minio     # 5.0.6    (pkgs = nixos-23.05)
+    istioctl          # 1.18.0   (pkgs = nixos-unstable on 01 Jul 2023)
+    argocd            # 2.7.6    (pkgs = nixos-unstable on 01 Jul 2023)
   ];
 
   # Tools to install on every cluster node.
   node = node-cli ++ node-cloud;
 
   # Tools for K8s stack dev & ops to be installed in dev shells.
-  dev = [             # version (pkgs = nixos-unstable branch on 19 Jan 2023)
-    git               # 2.39.0
-    kubectl           # 1.26.0
-    kustomize         # 4.5.4
-    kubernetes-helm   # 3.11.0
-    qemu              # 7.2.0
+  dev = [             # version (pkgs = nixos-23.05)
+    git               # 2.40.1
+    kubectl           # 1.27.1
+    kustomize         # 5.0.3
+    kubernetes-helm   # 3.11.3
+    qemu              # 8.0.0
     nixos-rebuild
   ] ++ node-cloud;
 

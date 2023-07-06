@@ -1,0 +1,22 @@
+#
+# TODO: the procedure in the Istio docs doesn't work.
+# I made SkyWalking the default tracing provider in the Istio profile and
+# then ran istioctl install again. The SkyWalking services seems to work
+# fine (except for oap the readiness probe, see below) but they can't get
+# data from the Istio sidecars.
+#
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+
+resources:
+- https://raw.githubusercontent.com/istio/istio/1.18.0/samples/addons/extras/skywalking.yaml
+
+patches:
+# Zap readiness probe since it calls /skywalking/bin/swctl which doesn't
+# work on aarch64. Probably the binary they packed in the arm64 Docker image
+# isn't an arm64 binary.
+- target:
+    kind: Deployment
+    name: skywalking-oap
+  path: remove-oap-readiness-probe.yaml

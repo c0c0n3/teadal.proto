@@ -13,12 +13,12 @@ a Multipass VM and install K8s `1.25` in it.
 
 ### Create the Multipass VM
 
-After installing Multipass, start an Ubuntu `20.04` VM with at least
-2 CPUs, 4GB of RAM and 40GB disk—if you can up the CPU count and give
+After installing Multipass, start an Ubuntu `22.04` VM with at least
+2 CPUs, 4GB of RAM and 50GB disk—if you can up the CPU count and give
 it more RAM it'd be much better though.
 
 ```bash
-$ multipass launch --name teadal --cpus 2 --mem 4G --disk 40G 20.04
+$ multipass launch --name teadal --cpus 2 --memory 4G --disk 50G 22.04
 ```
 
 Now shell into the freshly minted system
@@ -31,10 +31,10 @@ $ multipass shell teadal
 ### Install MicroK8s
 
 We'll use [MicroK8s][mk8s] as a cluster manager and orchestration.
-Install MicroK8s (upstream Kubernetes `1.25`)
+Install MicroK8s (upstream Kubernetes `1.27`)
 
 ```bash
-$ sudo snap install microk8s --classic --channel=1.25/stable
+$ sudo snap install microk8s --classic --channel=1.27/stable
 ```
 
 Add yourself to the MicroK8s group to avoid having to `sudo` every
@@ -54,7 +54,8 @@ $ microk8s status --wait-ready
 Finally bolt on DNS and local storage
 
 ```bash
-$ microk8s enable dns hostpath-storage
+$ microk8s enable dns
+$ microk8s enable hostpath-storage
 ```
 
 Wait until all the above extras show in the "enabled" list

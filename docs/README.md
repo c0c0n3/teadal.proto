@@ -5,7 +5,7 @@ Teadal cloud proto
 Here's some initial dev notes to explain part of what's been done.
 
 - [Cluster bootstrap][bootstrap]. Assembling a fully-fledged K8s
-  `1.25.4` cluster we can later use to host our cloud stack—Istio
+  `1.27.1` cluster we can later use to host our cloud stack—Istio
   & add-ons, Argo CD, etc. We use GitOps at the OS-level too, managing
   nodes remotely through config files in a Git repo. Plus, we can
   reproduce the **exact same stack** on dev boxes to keep "works

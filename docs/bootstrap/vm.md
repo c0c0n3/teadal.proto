@@ -25,8 +25,11 @@ a NixOS machine having
   containers for you.
 - No firewall. You can turn it on if you really want it, but most
   likely it's not needed for a dev box?
-- Tools for K8s stack dev & ops: `kubectl`, `istioctl`, `argocd`
-  `kustomize` and `helm`.
+- Tools for K8s stack dev & ops: `kubectl` with `directpv` and `minio`
+  plugins, `istioctl`, `argocd`. These tools are available and configured
+  system-wide to work with the K8s cluster. Plus, if you run `nix shell`
+  with our Flake, you get extra tools like `kustomize` and `helm`. You
+  can find the full list in our `cli-tools` Nix package.
 - An admin user named `admin` with a password of `abc123`. (You
   can change the password later.) This user is also configured
   to have admin access to the K8s services, so e.g. `kubectl`
@@ -49,7 +52,7 @@ metal. In fact, that's what we do in the examples below.
 ### NixOS installation
 
 #### Booting the ISO image
-Download the NixOS 22.11 image and boot it on the designated victim,
+Download the NixOS 23.05 image and boot it on the designated victim,
 i.e. your target installation machine. How to do that exactly depends
 on your hardware—have a look at the NixOS manual for the details. For
 the sake of having a concrete example, we use Qemu—[our Nix shell][dev-env]
@@ -66,7 +69,7 @@ Then make Qemu boot from the NixOS ISO image file
 
 ```bash
 $ qemu-system-x86_64 \
-    -cdrom nixos-minimal-22.11.1895.ab1254087f4-x86_64-linux.iso \
+    -cdrom nixos-minimal-23.05.1156.ad157fe26e7-x86_64-linux.iso \
     -drive "file=devm.img.qcow2,format=qcow2" \
     -machine q35,vmport=off -cpu host -smp 2 -m 4G -accel hvf
 ```

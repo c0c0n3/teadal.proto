@@ -15,7 +15,7 @@ and "Local storage instead of DirectPV" sections below.
 
 ### Setting the stage
 
-You should have a K8s `1.25` cluster up and running and a shell with
+You should have a K8s `1.27` cluster up and running and a shell with
 a `KUBECONFIG` env var pointing to the admin creds for your cluster.
 
 The commands in the sections below assume you have
@@ -26,6 +26,10 @@ The commands in the sections below assume you have
 
 
 ### Direct PV
+
+**TODO**: the steps below won't work w/ the latest DirectPV (4.0.6).
+They worked w/ version 3 but we can't use that version anymore. Put
+together new instructions when you get DirectPV to work w/ K8s 1.27.
 
 Install K8s CRDs, perms, Direct PV controller, node drivers, etc.
 

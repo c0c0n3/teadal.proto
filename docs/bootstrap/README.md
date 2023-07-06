@@ -4,7 +4,7 @@ Cluster bootstrap
 
 We need to put together a K8s baseline installation we can later
 use to host our cloud stack—Istio & add-ons, Argo CD, etc. The
-outcome should be a fully-fledged, K8s `1.25.4` cluster. Also,
+outcome should be a fully-fledged, K8s `1.27.1` cluster. Also,
 each node should have an OS base we can fully manage remotely through
 config files in a Git repo. Plus, we should be able to reproduce
 the **exact same stack** on dev boxes to keep "works on my machine"

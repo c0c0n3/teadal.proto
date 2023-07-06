@@ -33,10 +33,19 @@ spec:
     spec:
       containers:
       - name: keycloak
-        image: quay.io/keycloak/keycloak:16.1.0
+        image: quay.io/keycloak/keycloak:21.1.2
+        args:
+        - start
         env:
-        - name: PROXY_ADDRESS_FORWARDING
+        # Use HTTP (we'll switch to HTTPs later on for pilot deployments)
+        # and build URLs of depending on host and port found in the request.
+        - name: KC_HTTP_ENABLED
           value: "true"
+        - name: KC_HTTP_RELATIVE_PATH
+          value: /keycloak/
+        - name: KC_HOSTNAME_STRICT
+          value: "false"
+
         # NOTE this initial admin can only be used on first boot.
         # In fact, Keycloak will create it in its DB only if it isn't
         # there already. So the second time this pod restarts the user
@@ -44,30 +53,28 @@ spec:
         # var will have no effect---you'll have to log onto Keycloak to
         # change it. This is why we're not asking Reloader to monitor
         # changes to this pod's linked secret.
-        - name: KEYCLOAK_USER
+        - name: KEYCLOAK_ADMIN
           valueFrom:
             secretKeyRef:
               name: keycloak-builtin-admin
               key: username
-        - name: KEYCLOAK_PASSWORD
+        - name: KEYCLOAK_ADMIN_PASSWORD
           valueFrom:
             secretKeyRef:
               name: keycloak-builtin-admin
               key: password
-        - name: DB_VENDOR
-          value: "h2"
         ports:
         - name: http
           containerPort: 8080
-        - name: https
-          containerPort: 8443
+        # - name: https
+        #   containerPort: 8443
         readinessProbe:
           httpGet:
-            path: /auth/realms/master
+            path: /keycloak/realms/master
             port: 8080
         volumeMounts:
         - name: h2-volume
-          mountPath: /opt/jboss/keycloak/standalone/data
+          mountPath: /opt/keycloak/data/h2/
       volumes:
       - name: h2-volume
         persistentVolumeClaim:

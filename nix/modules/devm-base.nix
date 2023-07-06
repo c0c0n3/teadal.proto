@@ -30,15 +30,15 @@ with types;
     teadal.k8s = {
       # package = pkgs.teadal.k8s;
       # ^ uncomment the line above to install a more recent K8s than the
-      # one that comes w/ the NixOS package set. (NixOS 22.11 ships K8s
-      # 1.25.4.)
+      # one that comes w/ the NixOS package set. (NixOS 23.05 ships K8s
+      # 1.27.1.)
       dev-node.enable = true;
     };
 
     # Allow remote access through SSH, even for root.
     services.openssh = {
       enable = true;
-      permitRootLogin = "yes";
+      settings.PermitRootLogin = "yes";
     };
 
     # Get rid of the firewall.
