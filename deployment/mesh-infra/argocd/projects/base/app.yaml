@@ -7,8 +7,7 @@ spec:
   project: mesh-infra
   source:
     repoURL: https://github.com/c0c0n3/teadal.proto
-    # targetRevision: HEAD
-    targetRevision: nixos-k8s-upgrade
+    targetRevision: HEAD
     path: deployment/mesh-infra/app
   destination:
     server: https://kubernetes.default.svc

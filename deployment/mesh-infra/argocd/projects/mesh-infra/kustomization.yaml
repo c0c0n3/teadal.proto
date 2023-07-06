@@ -6,9 +6,9 @@ resources:
 - argocd
 - grafana
 - jaeger
-# - keycloak
+- keycloak
 - kiali
 - prometheus
-# - pvc
-# - reloader
+- pvc
+- reloader
 - routing

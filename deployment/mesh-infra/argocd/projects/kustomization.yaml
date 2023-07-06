@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
 - mesh-infra
 - plat-app-services
-# - plat-infra-services
+- plat-infra-services
