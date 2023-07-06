@@ -8,6 +8,7 @@ resources:
 - jaeger
 - keycloak
 - kiali
+- minio
 - prometheus
 - pvc
 - reloader
