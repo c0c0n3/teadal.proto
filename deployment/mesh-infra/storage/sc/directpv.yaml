@@ -1,0 +1,11 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: directpv-min-io
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+
+# NOTE
+# ----
+# 1. Provisioner. Weird, but true. The above def is a copy-paste from
+# - https://github.com/minio/operator
