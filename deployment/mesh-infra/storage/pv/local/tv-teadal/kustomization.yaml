@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- tv-teadal-1.yaml
+- tv-teadal-2.yaml
+- tv-teadal-3.yaml
+- tv-teadal-4.yaml
+- tv-teadal-5.yaml
+
+# NOTE
+# ----
+# 1. Required attached storage. For the above PVs to work, we need 5 dirs
+# on host `tv-teadal` created like this:
+#
+#     $ sudo mkdir -p /mnt/k8s-data/d{1..5}
+#     $ sudo chmod -R 777 /mnt/k8s-data
+#
+# Ideally each of them should actually be backed by a disk or a partition,
+# but if you're in a hurry and don't care about proper storage, just running
+# the above commands will do.
