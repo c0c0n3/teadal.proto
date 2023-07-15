@@ -3,7 +3,6 @@ kind: Kustomization
 
 # NOTE (1), (2)
 resources:
-# - base.yaml
 - operator.yaml
 - teadal-tenant.yaml
 
