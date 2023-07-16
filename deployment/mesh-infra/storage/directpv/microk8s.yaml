@@ -921,7 +921,7 @@ spec:
       - args:
         - --v=3
         - --csi-address=unix:///csi/csi.sock
-        - --kubelet-registration-path=/var/lib/kubelet/plugins/directpv-min-io/csi.sock
+        - --kubelet-registration-path=/var/snap/microk8s/common/var/lib/kubelet/plugins/directpv-min-io/csi.sock
         env:
         - name: KUBE_NODE_NAME
           valueFrom:
@@ -994,10 +994,10 @@ spec:
         - mountPath: /csi
           mountPropagation: None
           name: socket-dir
-        - mountPath: /var/lib/kubelet/pods
+        - mountPath: /var/snap/microk8s/common/var/lib/kubelet/pods
           mountPropagation: Bidirectional
           name: mountpoint-dir
-        - mountPath: /var/lib/kubelet/plugins
+        - mountPath: /var/snap/microk8s/common/var/lib/kubelet/plugins
           mountPropagation: Bidirectional
           name: plugins-dir
         - mountPath: /var/lib/directpv/
@@ -1038,10 +1038,10 @@ spec:
         - mountPath: /csi
           mountPropagation: None
           name: socket-dir
-        - mountPath: /var/lib/kubelet/pods
+        - mountPath: /var/snap/microk8s/common/var/lib/kubelet/pods
           mountPropagation: Bidirectional
           name: mountpoint-dir
-        - mountPath: /var/lib/kubelet/plugins
+        - mountPath: /var/snap/microk8s/common/var/lib/kubelet/plugins
           mountPropagation: Bidirectional
           name: plugins-dir
         - mountPath: /var/lib/directpv/
@@ -1077,19 +1077,19 @@ spec:
       serviceAccountName: directpv-min-io
       volumes:
       - hostPath:
-          path: /var/lib/kubelet/plugins/directpv-min-io
+          path: /var/snap/microk8s/common/var/lib/kubelet/plugins/directpv-min-io
           type: DirectoryOrCreate
         name: socket-dir
       - hostPath:
-          path: /var/lib/kubelet/pods
+          path: /var/snap/microk8s/common/var/lib/kubelet/pods
           type: DirectoryOrCreate
         name: mountpoint-dir
       - hostPath:
-          path: /var/lib/kubelet/plugins_registry
+          path: /var/snap/microk8s/common/var/lib/kubelet/plugins_registry
           type: DirectoryOrCreate
         name: registration-dir
       - hostPath:
-          path: /var/lib/kubelet/plugins
+          path: /var/snap/microk8s/common/var/lib/kubelet/plugins
           type: DirectoryOrCreate
         name: plugins-dir
       - hostPath:
@@ -1235,7 +1235,7 @@ spec:
       serviceAccountName: directpv-min-io
       volumes:
       - hostPath:
-          path: /var/lib/kubelet/plugins/controller-controller
+          path: /var/snap/microk8s/common/var/lib/kubelet/plugins/controller-controller
           type: DirectoryOrCreate
         name: socket-dir
 status: {}

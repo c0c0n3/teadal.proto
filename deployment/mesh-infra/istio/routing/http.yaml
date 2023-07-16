@@ -40,6 +40,18 @@ spec:
         host: keycloak.default.svc.cluster.local
         port:
           number: 8080
+  - match:  # NOTE (1)
+    - uri:
+        prefix: /minio/
+    - uri:
+        prefix: /minio
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: minio.minio-operator.svc.cluster.local
+        port:
+          number: 80
 
 # NOTE
 # 1. URL rewriting. We use overlapping prefixes to make sure `/x`, `/x/`

@@ -5,8 +5,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  # storageClassName: directpv-min-io
-  storageClassName: microk8s-hostpath
+  storageClassName: directpv-min-io
   resources:
     requests:
       storage: 1Gi

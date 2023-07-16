@@ -1,5 +1,49 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+# NOTE (1), (2)
 resources:
-- base.yaml
+- operator.yaml
+- teadal-tenant.yaml
+
+patches:
+- path: operator-replicas.yaml
+  target:
+    kind: Deployment
+    name: minio-operator
+- path: fix-tenant-pool-creation-timestamp.yaml
+  target:
+    kind: Tenant
+    name: teadal
+# ^ NOTE (3)
+
+# NOTE
+# ----
+# 1. How to generate `operator.yaml`.
+#
+#     $ cd nix
+#     $ nix shell
+#     $ cd ../deployment/mesh-infra/storage/minio
+#     $ kubectl minio init -o > operator.yaml
+#
+# 2. How to generate `teadal-tenant.yaml`. You can only do this if your
+# Kube config points to the Teadal cluster and the MinIO Operator is already
+# running in the cluster. Then
+#
+#     $ cd nix
+#     $ nix shell
+#     $ cd ../deployment/mesh-infra/storage/minio
+#     $ kubectl minio tenant create teadal \
+#         --namespace minio-operator \
+#         --pool teadal \
+#         --servers 1 \
+#         --storage-class local-storage \
+#         --volumes 1 \
+#         --capacity 1Gi \
+#         --expose-minio-service \
+#         --disable-tls \
+#         --output > teadal-tenant.yaml
+#
+# 3. MinIO Tenant CRD bug. Operator doesn't like what comes out of the above
+# command and will fail validation. Reason: the creation timestamp shouldn't
+# be there. So we remove it with a Kustomize patch.

@@ -2,18 +2,38 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- base.yaml
+# - base.yaml
+# - microk8s.yaml
 
 
 # NOTE
 # ----
-# 1. Direct PV. We generated the initial YAML file by running:
+# 1. Installation. To install DirectPV you'll have to choose one of
+# the two files above depending on whether you're installing on a
+# standard K8s cluster (use `base.yaml` in this case) or MicroK8s.
+# Notice DirectPV only supports x86-64/amd64 architectures, so don't
+# try installing on Aarch64/ARM64. See:
+# - https://github.com/c0c0n3/teadal.proto/issues/8
 #
-# $ cd nix && nix shell
-# $ kubectl directpv install --dry-run --image 'directpv:v3.2.2' > base.yaml
+# 2. Operation. Use the Nix-bundled plugin to manage drives, e.g.
 #
-# Notice the Docker image version you specify above should be the
-# same as that of the `kubectl-directpv` tool in the Nix shell.
-# See also:
-# - https://github.com/minio/directpv/blob/master/docs/installation.md
-# - https://github.com/minio/directpv/blob/master/docs/cli.md
+#    $ cd nix && nix shell
+#    $ kubectl directpv discover
+#    $ kubectl directpv init --dangerous drives.yaml
+#
+# 3. Manifest generation. We generated the initial base YAML file by
+# running:
+#
+#     $ cd nix && nix shell
+#     $ kubectl directpv install -o yaml > base.yaml
+#
+# whereas we had to do this for the MicroK8s manifests
+#
+#     $ cd nix && nix shell
+#     $ export KUBELET_DIR_PATH=/var/snap/microk8s/common/var/lib/kubelet
+#     $ kubectl directpv install -o yaml > microk8s.yaml
+#
+# See:
+# - https://github.com/minio/directpv/issues/816#issuecomment-1637071486
+#
+# 4. Testing. Read the README in the test dir---pun intended :-)
