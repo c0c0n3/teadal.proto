@@ -5,3 +5,26 @@ resources:
 # - directpv/
 # - microks-hostpath/
 - local/
+
+# NOTE
+# ----
+# 1. PVC sets. We've got a set of PVCs in correspondence of each
+# storage class we support:
+# - Local storage. At the moment we're squeezing the whole cluster
+#   into a single node, so local storage is our default. (You'll
+#   have to manually provision volumes for this to work, see
+#   `mesh-infra/storage/pv`.)
+# - DirectPV. Use this in a multi-node cluster. (You'll have to
+#   enable DirectPV first, see `mesh-infra/storage/directpv`.)
+# - MicroK8s hostpath. Legacy. Stay away from it if you can, even
+#   MicroK8s deprecated it, but it can still be useful for a quick
+#   & dirty setup.
+#
+# Each set contains PVCs for the services that need persistent
+# storage. Notice the Teadal MinIO tenant also uses a PVC (see
+# `mesh-infra/storage/minio`) but it was too much of a mission
+# to strip it out of the MinIO-generated manifest, so we leave
+# it there. Also notice the Teadal tenant's PVC is backed by
+# local storage, but you can easily regenerate the manifest to
+# use e.g. DirectPV---see `mesh-infra/storage/minio` for the
+# details.
