@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
 - project.yaml
 - argocd
+- directpv
 - grafana
 - jaeger
 - keycloak
