@@ -2,13 +2,7 @@ DirectPV Smoke Test
 -------------------
 > Sanity check to make sure the installation worked.
 
-After installing DirectPV
-
-```bash
-$ kubectl directpv install
-```
-
-check the `info` command works fine
+After installing DirectPV, check the `info` command works fine
 
 ```bash
 $ kubectl directpv info
