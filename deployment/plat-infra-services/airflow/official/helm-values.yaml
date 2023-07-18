@@ -1,0 +1,29 @@
+dags:
+  persistence:
+    storageClassName: directpv-min-io
+    size: 1Gi
+
+logs:
+  persistence:
+    storageClassName: directpv-min-io
+    size: 1Gi
+
+workers:
+  persistence:
+    storageClassName: directpv-min-io
+    size: 1Gi
+
+triggerer:
+  persistence:
+    storageClassName: directpv-min-io
+    size: 1Gi
+
+redis:
+  persistence:
+    storageClassName: directpv-min-io
+    size: 1Gi
+
+postgresql:
+  primary:
+    persistence:
+      storageClass: directpv-min-io

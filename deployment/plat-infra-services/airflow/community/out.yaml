@@ -1,0 +1,1544 @@
+---
+# Source: airflow/templates/rbac/airflow-serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: airflow
+  labels:
+    app: airflow
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+---
+# Source: airflow/charts/postgresql/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: airflow-postgresql
+  labels:
+    app: postgresql
+    chart: postgresql-8.6.4
+    release: "airflow"
+    heritage: "Helm"
+type: Opaque
+data:
+  postgresql-password: "YWlyZmxvdw=="
+---
+# Source: airflow/templates/config/secret-config-envs.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: airflow-config-envs
+  labels:
+    app: airflow
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+## we must use `data` rather than `stringData` (see: https://github.com/helm/helm/issues/10010)
+data:
+  ## ================
+  ## Linux Configs
+  ## ================
+  TZ: "RXRjL1VUQw=="
+
+  ## ================
+  ## Database Configs
+  ## ================
+  ## database host/port
+  DATABASE_HOST: "YWlyZmxvdy1wZ2JvdW5jZXIuYWlyZmxvdy5zdmMuY2x1c3Rlci5sb2NhbA=="
+  DATABASE_PORT: "NjQzMg=="
+
+  ## database configs
+  DATABASE_DB: "YWlyZmxvdw=="
+
+  ## bash command which echos the URL encoded value of $DATABASE_USER
+  DATABASE_USER_CMD: "ZWNobyAiJHtEQVRBQkFTRV9VU0VSfSIgfCBweXRob24zIC1jICJpbXBvcnQgdXJsbGliLnBhcnNlOyBlbmNvZGVkX3VzZXIgPSB1cmxsaWIucGFyc2UucXVvdGUoaW5wdXQoKSk7IHByaW50KGVuY29kZWRfdXNlciki"
+
+  ## bash command which echos the URL encoded value of $DATABASE_PASSWORD
+  DATABASE_PASSWORD_CMD: "ZWNobyAiJHtEQVRBQkFTRV9QQVNTV09SRH0iIHwgcHl0aG9uMyAtYyAiaW1wb3J0IHVybGxpYi5wYXJzZTsgZW5jb2RlZF9wYXNzID0gdXJsbGliLnBhcnNlLnF1b3RlKGlucHV0KCkpOyBwcmludChlbmNvZGVkX3Bhc3MpIg=="
+
+  ## bash command which echos the DB connection string in SQLAlchemy format
+  DATABASE_SQLALCHEMY_CMD: "ZWNobyAtbiAicG9zdGdyZXNxbCtwc3ljb3BnMjovLyQoZXZhbCAkREFUQUJBU0VfVVNFUl9DTUQpOiQoZXZhbCAkREFUQUJBU0VfUEFTU1dPUkRfQ01EKUAke0RBVEFCQVNFX0hPU1R9OiR7REFUQUJBU0VfUE9SVH0vJHtEQVRBQkFTRV9EQn0i"
+
+  ## bash command which echos the DB connection string in Celery result_backend format
+  DATABASE_CELERY_CMD: "ZWNobyAtbiAiZGIrcG9zdGdyZXNxbDovLyQoZXZhbCAkREFUQUJBU0VfVVNFUl9DTUQpOiQoZXZhbCAkREFUQUJBU0VfUEFTU1dPUkRfQ01EKUAke0RBVEFCQVNFX0hPU1R9OiR7REFUQUJBU0VfUE9SVH0vJHtEQVRBQkFTRV9EQn0i"
+  ## bash command which echos the DB connection string in `psql` cli format
+  ## NOTE: uses `127.0.0.1` as the host because this is only used in the pgbouncer liveness probe
+  ##       and minikube does not allow pods to access their own `cluster.local` service so would otherwise fail
+  DATABASE_PSQL_CMD: "ZWNobyAtbiAicG9zdGdyZXNxbDovLyQoZXZhbCAkREFUQUJBU0VfVVNFUl9DTUQpOiQoZXZhbCAkREFUQUJBU0VfUEFTU1dPUkRfQ01EKUAxMjcuMC4wLjE6JHtEQVRBQkFTRV9QT1JUfS8ke0RBVEFCQVNFX0RCfSR7REFUQUJBU0VfUFJPUEVSVElFU30i"
+
+  ## ================
+  ## Redis Configs
+  ## ================
+
+  ## ================
+  ## Airflow Configs (General)
+  ## ================
+  AIRFLOW__CORE__DAGS_FOLDER: "L29wdC9haXJmbG93L2RhZ3M="
+  AIRFLOW__CORE__EXECUTOR: "S3ViZXJuZXRlc0V4ZWN1dG9y"
+  AIRFLOW__CORE__FERNET_KEY: "N1Q1MTJVWFNTbUJPa3BXaW1GSElWYjhqSzZsZm1TQXZ4NG1PNkFyZWhuYz0="
+  AIRFLOW__WEBSERVER__SECRET_KEY: "VEhJUyBJUyBVTlNBRkUh"
+  AIRFLOW__WEBSERVER__WEB_SERVER_PORT: "ODA4MA=="
+  AIRFLOW__CELERY__FLOWER_PORT: "NTU1NQ=="
+
+  ## ================
+  ## Airflow Configs (Database)
+  ## ================
+  AIRFLOW__CORE__SQL_ALCHEMY_CONN_CMD: "YmFzaCAtYyAnZXZhbCAiJERBVEFCQVNFX1NRTEFMQ0hFTVlfQ01EIic="
+  ## `core.sql_alchemy_conn` moved to `database.sql_alchemy_conn` in airflow 2.3.0
+  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN_CMD: "YmFzaCAtYyAnZXZhbCAiJERBVEFCQVNFX1NRTEFMQ0hFTVlfQ01EIic="
+
+  ## ================
+  ## Airflow Configs (Triggerer)
+  ## ================
+  AIRFLOW__TRIGGERER__DEFAULT_CAPACITY: "MTAwMA=="
+
+  ## ================
+  ## Airflow Configs (Logging)
+  ## ================
+  AIRFLOW__LOGGING__BASE_LOG_FOLDER: "L29wdC9haXJmbG93L2xvZ3M="
+  AIRFLOW__LOGGING__DAG_PROCESSOR_MANAGER_LOG_LOCATION: "L29wdC9haXJmbG93L2xvZ3MvZGFnX3Byb2Nlc3Nvcl9tYW5hZ2VyL2RhZ19wcm9jZXNzb3JfbWFuYWdlci5sb2c="
+  AIRFLOW__SCHEDULER__CHILD_PROCESS_LOG_DIRECTORY: "L29wdC9haXJmbG93L2xvZ3Mvc2NoZWR1bGVy"
+
+  ## ================
+  ## Airflow Configs (Celery)
+  ## ================
+
+  ## ================
+  ## Airflow Configs (Kubernetes)
+  ## ================
+  AIRFLOW__KUBERNETES__NAMESPACE: "YWlyZmxvdw=="
+  AIRFLOW__KUBERNETES_EXECUTOR__NAMESPACE: "YWlyZmxvdw=="
+  AIRFLOW__KUBERNETES__WORKER_CONTAINER_REPOSITORY: "YXBhY2hlL2FpcmZsb3c="
+  AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_REPOSITORY: "YXBhY2hlL2FpcmZsb3c="
+  AIRFLOW__KUBERNETES__WORKER_CONTAINER_TAG: "Mi41LjMtcHl0aG9uMy44"
+  AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_TAG: "Mi41LjMtcHl0aG9uMy44"
+  AIRFLOW__KUBERNETES__POD_TEMPLATE_FILE: "L29wdC9haXJmbG93L3BvZF90ZW1wbGF0ZXMvcG9kX3RlbXBsYXRlLnlhbWw="
+  AIRFLOW__KUBERNETES_EXECUTOR__POD_TEMPLATE_FILE: "L29wdC9haXJmbG93L3BvZF90ZW1wbGF0ZXMvcG9kX3RlbXBsYXRlLnlhbWw="
+
+  ## ================
+  ## User Configs
+  ## ================
+  "AIRFLOW__CORE__LOAD_EXAMPLES": "RmFsc2U="
+  "AIRFLOW__WEBSERVER__EXPOSE_CONFIG": "RmFsc2U="
+---
+# Source: airflow/templates/config/secret-webserver-config.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: airflow-webserver-config
+  labels:
+    app: airflow
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+data:
+  webserver_config.py: "ZnJvbSBhaXJmbG93IGltcG9ydCBjb25maWd1cmF0aW9uIGFzIGNvbmYKZnJvbSBmbGFza19hcHBidWlsZGVyLnNlY3VyaXR5Lm1hbmFnZXIgaW1wb3J0IEFVVEhfREIKCiMgdGhlIFNRTEFsY2hlbXkgY29ubmVjdGlvbiBzdHJpbmcKU1FMQUxDSEVNWV9EQVRBQkFTRV9VUkkgPSBjb25mLmdldCgiY29yZSIsICJTUUxfQUxDSEVNWV9DT05OIikKCiMgdXNlIGVtYmVkZGVkIERCIGZvciBhdXRoCkFVVEhfVFlQRSA9IEFVVEhfREIK"
+---
+# Source: airflow/templates/db-migrations/db-migrations-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: airflow-db-migrations
+  labels:
+    app: airflow
+    component: db-migrations
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+data:
+  db_migrations.py: "CiMjIyMjIyMjIyMjIyMKIyMgSW1wb3J0cyAjIwojIyMjIyMjIyMjIyMjCmltcG9ydCBsb2dnaW5nCmltcG9ydCB0aW1lCmZyb20gYWlyZmxvdy51dGlscy5kYiBpbXBvcnQgdXBncmFkZWRiCgoKIyMjIyMjIyMjIyMjIwojIyBDb25maWdzICMjCiMjIyMjIyMjIyMjIyMKbG9nID0gbG9nZ2luZy5nZXRMb2dnZXIoX19maWxlX18pCmxvZy5zZXRMZXZlbCgiSU5GTyIpCgojIGhvdyBmcmVxdWVudGx5IHRvIGNoZWNrIGZvciB1bmFwcGxpZWQgbWlncmF0aW9ucwpDT05GX19DSEVDS19NSUdSQVRJT05TX0lOVEVSVkFMID0gMzAwCgoKIyMjIyMjIyMjIyMjIyMjCiMjIEZ1bmN0aW9ucyAjIwojIyMjIyMjIyMjIyMjIyMKZnJvbSBhaXJmbG93LnV0aWxzLmRiIGltcG9ydCBjaGVja19taWdyYXRpb25zCgoKZGVmIG5lZWRzX2RiX21pZ3JhdGlvbnMoKSAtPiBib29sOgogICAgIiIiCiAgICBSZXR1cm4gYSBib29sZWFuIHJlcHJlc2VudGluZyBpZiB0aGUgZGF0YWJhc2UgaGFzIHVuYXBwbGllZCBtaWdyYXRpb25zLgogICAgIiIiCiAgICBsb2dfYWxlbWJpYyA9IGxvZ2dpbmcuZ2V0TG9nZ2VyKCJhbGVtYmljLnJ1bnRpbWUubWlncmF0aW9uIikKICAgIGxvZ19hbGVtYmljX2xldmVsID0gbG9nX2FsZW1iaWMubGV2ZWwKICAgIHRyeToKICAgICAgICBsb2dfYWxlbWJpYy5zZXRMZXZlbCgiV0FSTiIpCiAgICAgICAgY2hlY2tfbWlncmF0aW9ucygxKQogICAgICAgIGxvZ19hbGVtYmljLnNldExldmVsKGxvZ19hbGVtYmljX2xldmVsKQogICAgICAgIHJldHVybiBGYWxzZQogICAgZXhjZXB0IFRpbWVvdXRFcnJvcjoKICAgICAgICByZXR1cm4gVHJ1ZQoKCmRlZiBhcHBseV9kYl9taWdyYXRpb25zKCkgLT4gTm9uZToKICAgICIiIgogICAgQXBwbHkgYW55IHBlbmRpbmcgREIgbWlncmF0aW9ucy4KICAgICIiIgogICAgbG9nLmluZm8oIi0tLS0tLS0tIFNUQVJUIC0gQVBQTFkgREIgTUlHUkFUSU9OUyAtLS0tLS0tLSIpCiAgICB1cGdyYWRlZGIoKQogICAgbG9nLmluZm8oIi0tLS0tLS0tIEZJTklTSCAtIEFQUExZIERCIE1JR1JBVElPTlMgLS0tLS0tLS0iKQoKCmRlZiBtYWluKHN5bmNfZm9yZXZlcjogYm9vbCk6CiAgICAjIGluaXRpYWwgY2hlY2sgJiBhcHBseQogICAgaWYgbmVlZHNfZGJfbWlncmF0aW9ucygpOgogICAgICAgIGxvZy53YXJuaW5nKCJ0aGVyZSBhcmUgdW5hcHBsaWVkIGRiIG1pZ3JhdGlvbnMsIHRyaWdnZXJpbmcgYXBwbHkuLi4iKQogICAgICAgIGFwcGx5X2RiX21pZ3JhdGlvbnMoKQogICAgZWxzZToKICAgICAgICBsb2cuaW5mbygidGhlcmUgYXJlIG5vIHVuYXBwbGllZCBkYiBtaWdyYXRpb25zLCBjb250aW51aW5nLi4uIikKCiAgICBpZiBzeW5jX2ZvcmV2ZXI6CiAgICAgICAgIyBkZWZpbmUgdmFyaWFibGUgdG8gdHJhY2sgaG93IGxvbmcgc2luY2UgbGFzdCBtaWdyYXRpb25zIGNoZWNrCiAgICAgICAgbWlncmF0aW9uc19jaGVja19lcG9jaCA9IHRpbWUudGltZSgpCgogICAgICAgICMgbWFpbiBsb29wCiAgICAgICAgd2hpbGUgVHJ1ZToKICAgICAgICAgICAgaWYgKHRpbWUudGltZSgpIC0gbWlncmF0aW9uc19jaGVja19lcG9jaCkgPiBDT05GX19DSEVDS19NSUdSQVRJT05TX0lOVEVSVkFMOgogICAgICAgICAgICAgICAgbG9nLmRlYnVnKGYiY2hlY2sgaW50ZXJ2YWwgcmVhY2hlZCwgY2hlY2tpbmcgZm9yIHVuYXBwbGllZCBkYiBtaWdyYXRpb25zLi4uIikKICAgICAgICAgICAgICAgIGlmIG5lZWRzX2RiX21pZ3JhdGlvbnMoKToKICAgICAgICAgICAgICAgICAgICBsb2cud2FybmluZygidGhlcmUgYXJlIHVuYXBwbGllZCBkYiBtaWdyYXRpb25zLCB0cmlnZ2VyaW5nIGFwcGx5Li4uIikKICAgICAgICAgICAgICAgICAgICBhcHBseV9kYl9taWdyYXRpb25zKCkKICAgICAgICAgICAgICAgIG1pZ3JhdGlvbnNfY2hlY2tfZXBvY2ggPSB0aW1lLnRpbWUoKQoKICAgICAgICAgICAgIyBlbnN1cmUgd2UgZG9udCBsb29wIHRvbyBmYXN0CiAgICAgICAgICAgIHRpbWUuc2xlZXAoMC41KQoKCiMjIyMjIyMjIyMjIyMjCiMjIFJ1biBNYWluICMjCiMjIyMjIyMjIyMjIyMjCm1haW4oc3luY19mb3JldmVyPVRydWUp"
+---
+# Source: airflow/templates/pgbouncer/pgbouncer-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: airflow-pgbouncer
+  labels:
+    app: airflow
+    component: pgbouncer
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+data:
+  pgbouncer.ini: "CltkYXRhYmFzZXNdCiogPSBob3N0PWFpcmZsb3ctcG9zdGdyZXNxbC5haXJmbG93LnN2Yy5jbHVzdGVyLmxvY2FsIHBvcnQ9NTQzMgoKW3BnYm91bmNlcl0KcG9vbF9tb2RlID0gdHJhbnNhY3Rpb24KbWF4X2NsaWVudF9jb25uID0gMTAwMApkZWZhdWx0X3Bvb2xfc2l6ZSA9ICAyMAppZ25vcmVfc3RhcnR1cF9wYXJhbWV0ZXJzID0gZXh0cmFfZmxvYXRfZGlnaXRzCgpsaXN0ZW5fcG9ydCA9IDY0MzIKbGlzdGVuX2FkZHIgPSAqCgphdXRoX3R5cGUgPSBtZDUKYXV0aF9maWxlID0gL2hvbWUvcGdib3VuY2VyL3VzZXJzLnR4dAoKbG9nX2Rpc2Nvbm5lY3Rpb25zID0gMApsb2dfY29ubmVjdGlvbnMgPSAwCgojIGxvY2tzIHdpbGwgbmV2ZXIgYmUgcmVsZWFzZWQgd2hlbiBgcG9vbF9tb2RlPXRyYW5zYWN0aW9uYCAoYWlyZmxvdyBpbml0ZGIvdXBncmFkZWRiIHNjcmlwdHMgY3JlYXRlIGxvY2tzKQpzZXJ2ZXJfcmVzZXRfcXVlcnkgPSBTRUxFQ1QgcGdfYWR2aXNvcnlfdW5sb2NrX2FsbCgpCnNlcnZlcl9yZXNldF9xdWVyeV9hbHdheXMgPSAxCgojIyBDTElFTlQgVExTIFNFVFRJTkdTICMjCmNsaWVudF90bHNfc3NsbW9kZSA9IHByZWZlcgpjbGllbnRfdGxzX2NpcGhlcnMgPSBub3JtYWwKY2xpZW50X3Rsc19rZXlfZmlsZSA9IC9ob21lL3BnYm91bmNlci9nZW5lcmF0ZWQtY2VydHMvY2xpZW50LmtleQpjbGllbnRfdGxzX2NlcnRfZmlsZSA9IC9ob21lL3BnYm91bmNlci9nZW5lcmF0ZWQtY2VydHMvY2xpZW50LmNydAoKIyMgU0VSVkVSIFRMUyBTRVRUSU5HUyAjIwpzZXJ2ZXJfdGxzX3NzbG1vZGUgPSBwcmVmZXIKc2VydmVyX3Rsc19jaXBoZXJzID0gbm9ybWFs"
+  gen_auth_file.sh: "CiMhL2Jpbi9zaCAtZQoKIyBERVNDUklQVElPTjoKIyAtIHVwZGF0ZXMgdGhlIHBnYm91bmNlciBgYXV0aF9maWxlYCBmcm9tIGVudmlyb25tZW50IHZhcmlhYmxlcwojIC0gY2FsbGVkIGluIG1haW4gcGdib3VuY2VyIGNvbnRhaW5lciBzdGFydC1jb21tYW5kIHNvIHRoYXQgYGF1dGhfZmlsZWAgaXMgdXBkYXRlZCBlYWNoIHJlc3RhcnQsCiMgICBmb3IgZXhhbXBsZSwgd2hlbiB0aGUgbGl2ZW5lc3NQcm9iZSBmYWlscyBkdWUgdG8gYSBEQVRBQkFTRV9QQVNTV09SRCBzZWNyZXQgdXBkYXRlCgojIHZhcmlhYmxlcyB0byBpbmNyZWFzZSBjbGFyaXR5IG9mIHBhdHRlcm4gbWF0Y2hpbmcKT05FX1FVT1RFPSciJwpUV09fUVVPVEU9JyIiJwoKIyBwZ2JvdW5jZXIgcmVxdWlyZXMgYCJgIHRvIGJlIGVzY2FwZWQgYXMgYCIiYApFU0NBUEVEX0RBVEFCQVNFX1VTRVI9IiR7REFUQUJBU0VfVVNFUi8kT05FX1FVT1RFLyRUV09fUVVPVEV9IgpFU0NBUEVEX0RBVEFCQVNFX1BBU1NXT1JEPSIke0RBVEFCQVNFX1BBU1NXT1JELyRPTkVfUVVPVEUvJFRXT19RVU9URX0iCgojIHBnYm91bmNlciByZXF1aXJlcyBhdXRoX2ZpbGUgaW4gZm9ybWF0IGAibXktdXNlcm5hbWUiICJteS1wYXNzd29yZCJgCmVjaG8gXCIkRVNDQVBFRF9EQVRBQkFTRV9VU0VSXCIgXCIkRVNDQVBFRF9EQVRBQkFTRV9QQVNTV09SRFwiID4gL2hvbWUvcGdib3VuY2VyL3VzZXJzLnR4dAplY2hvICJTdWNjZXNzZnVsbHkgZ2VuZXJhdGVkIGF1dGhfZmlsZTogL2hvbWUvcGdib3VuY2VyL3VzZXJzLnR4dCI="
+  gen_self_signed_cert.sh: "CiMhL2Jpbi9zaCAtZQoKQ0VSVF9ESVI9Ii9ob21lL3BnYm91bmNlci9nZW5lcmF0ZWQtY2VydHMiCktFWV9GSUxFPSIkQ0VSVF9ESVIvY2xpZW50LmtleSIKQ0VSVF9GSUxFPSIkQ0VSVF9ESVIvY2xpZW50LmNydCIKCiMgY3JlYXRlIHRoZSBkaXJlY3RvcnkgZm9yIHRoZSBzZWxmLXNpZ25lZCBjZXJ0aWZpY2F0ZQpta2RpciAtcCAiJENFUlRfRElSIgoKIyB2YXJpYWJsZXMgZm9yIGNlcnRpZmljYXRlIGdlbmVyYXRpb24KQ09NTU9OX05BTUU9ImxvY2FsaG9zdCIKREFZU19WQUxJRD0zNjUKCiMgZ2VuZXJhdGUgdGhlIHNlbGYtc2lnbmVkIGNlcnRpZmljYXRlIGFuZCBhIHByaXZhdGUga2V5Cm9wZW5zc2wgcmVxIC14NTA5IFwKICAtbmV3a2V5IHJzYTo0MDk2IFwKICAta2V5b3V0ICIkS0VZX0ZJTEUiIFwKICAtb3V0ICIkQ0VSVF9GSUxFIiBcCiAgLWRheXMgIiREQVlTX1ZBTElEIiBcCiAgLXN1YmogIi9DTj0kQ09NTU9OX05BTUUiIFwKICAtbm9kZXMKCiMgc2V0IHBlcm1pc3Npb25zIGZvciB0aGUgcHJpdmF0ZSBrZXkgZmlsZQpjaG1vZCA2MDAgIiRLRVlfRklMRSIKCmVjaG8gIlN1Y2Nlc3NmdWxseSBnZW5lcmF0ZWQgc2VsZi1zaWduZWQgY2VydGlmaWNhdGU6ICRDRVJUX0ZJTEUiCmVjaG8gIlN1Y2Nlc3NmdWxseSBnZW5lcmF0ZWQgc2VsZi1zaWduZWQgY2VydGlmaWNhdGUga2V5OiAkS0VZX0ZJTEUi"
+---
+# Source: airflow/templates/sync/sync-users-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: airflow-sync-users
+  labels:
+    app: airflow
+    component: sync-users
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+data:
+  sync_users.py: "CiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKIyMjIyBCRUdJTjogR0xPQkFMIENPREUgIyMjIwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjCiMjIyMjIyMjIyMjIyMjIyMjIyMjCiMjIEdsb2JhbCBJbXBvcnRzICMjCiMjIyMjIyMjIyMjIyMjIyMjIyMjCmltcG9ydCBsb2dnaW5nCmltcG9ydCBvcwppbXBvcnQgdGltZQpmcm9tIHN0cmluZyBpbXBvcnQgVGVtcGxhdGUKZnJvbSB0eXBpbmcgaW1wb3J0IExpc3QsIERpY3QsIE9wdGlvbmFsCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMKIyMgR2xvYmFsIENvbmZpZ3MgIyMKIyMjIyMjIyMjIyMjIyMjIyMjIyMKIyB0aGUgcGF0aCB3aGljaCBTZWNyZXQvQ29uZmlnTWFwIGFyZSBtb3VudGVkIHRvCkNPTkZfX1RFTVBMQVRFU19QQVRIID0gIi9tbnQvdGVtcGxhdGVzIgoKIyBob3cgZnJlcXVlbnRseSB0byBjaGVjayBmb3IgU2VjcmV0L0NvbmZpZ01hcCB1cGRhdGVzCkNPTkZfX1RFTVBMQVRFU19TWU5DX0lOVEVSVkFMID0gMTAKCiMgaG93IGZyZXF1ZW50bHkgdG8gcmUtc3luYyBvYmplY3RzIChDb25uZWN0aW9ucywgUG9vbHMsIFVzZXJzLCBWYXJpYWJsZXMpCkNPTkZfX09CSkVDVFNfU1lOQ19JTlRFUlZBTCA9IDYwCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwojIyBHbG9iYWwgRnVuY3Rpb25zICMjCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKZGVmIHN0cmluZ19zdWJzdGl0dXRpb24ocmF3X3N0cmluZzogT3B0aW9uYWxbc3RyXSwgc3Vic3RpdHV0aW9uX21hcDogRGljdFtzdHIsIHN0cl0pIC0+IHN0cjoKICAgICIiIgogICAgQXBwbHkgYmFzaC1saWtlIHN1YnN0aXR1dGlvbnMgdG8gYSByYXcgc3RyaW5nLgoKICAgIEV4YW1wbGU6CiAgICAtIHN0cmluZ19zdWJzdGl0dXRpb24oIkhlbGxvISIsIE5vbmUpIC0+ICJIZWxsbyEiCiAgICAtIHN0cmluZ19zdWJzdGl0dXRpb24oIkhlbGxvICR7TkFNRX0hIiwgeyJOQU1FIjogIkFpcmZsb3cifSkgLT4gIkhlbGxvIEFpcmZsb3chIgogICAgIiIiCiAgICBpZiByYXdfc3RyaW5nIGFuZCBsZW4oc3Vic3RpdHV0aW9uX21hcCkgPiAwOgogICAgICAgIHRwbCA9IFRlbXBsYXRlKHJhd19zdHJpbmcpCiAgICAgICAgcmV0dXJuIHRwbC5zYWZlX3N1YnN0aXR1dGUoc3Vic3RpdHV0aW9uX21hcCkKICAgIGVsc2U6CiAgICAgICAgcmV0dXJuIHJhd19zdHJpbmcKCgpkZWYgdGVtcGxhdGVfbXRpbWUodGVtcGxhdGVfbmFtZTogc3RyKSAtPiBmbG9hdDoKICAgICIiIgogICAgUmV0dXJuIHRoZSBtb2RpZmljYXRpb24tdGltZSBvZiB0aGUgZmlsZSBzdG9yaW5nIGB0ZW1wbGF0ZV9uYW1lYAogICAgIiIiCiAgICBmaWxlX3BhdGggPSBmIntDT05GX19URU1QTEFURVNfUEFUSH0ve3RlbXBsYXRlX25hbWV9IgogICAgcmV0dXJuIG9zLnN0YXQoZmlsZV9wYXRoKS5zdF9tdGltZQoKCmRlZiB0ZW1wbGF0ZV92YWx1ZSh0ZW1wbGF0ZV9uYW1lOiBzdHIpIC0+IHN0cjoKICAgICIiIgogICAgUmV0dXJuIHRoZSBjb250ZW50cyBvZiB0aGUgZmlsZSBzdG9yaW5nIGB0ZW1wbGF0ZV9uYW1lYAogICAgIiIiCiAgICBmaWxlX3BhdGggPSBmIntDT05GX19URU1QTEFURVNfUEFUSH0ve3RlbXBsYXRlX25hbWV9IgogICAgd2l0aCBvcGVuKGZpbGVfcGF0aCwgInIiKSBhcyBmOgogICAgICAgIHJldHVybiBmLnJlYWQoKQoKCmRlZiByZWZyZXNoX3RlbXBsYXRlX2NhY2hlKHRlbXBsYXRlX25hbWVzOiBMaXN0W3N0cl0sCiAgICAgICAgICAgICAgICAgICAgICAgICAgIHRlbXBsYXRlX210aW1lX2NhY2hlOiBEaWN0W3N0ciwgZmxvYXRdLAogICAgICAgICAgICAgICAgICAgICAgICAgICB0ZW1wbGF0ZV92YWx1ZV9jYWNoZTogRGljdFtzdHIsIHN0cl0pIC0+IExpc3Rbc3RyXToKICAgICIiIgogICAgUmVmcmVzaCB0aGUgcHJvdmlkZWQgZGljdGlvbmFyeSBjYWNoZXMgb2YgdGVtcGxhdGUgdmFsdWVzICYgbXRpbWVzLgoKICAgIDpwYXJhbSB0ZW1wbGF0ZV9uYW1lczogdGhlIG5hbWVzIG9mIGFsbCB0ZW1wbGF0ZXMgdG8gcmVmcmVzaAogICAgOnBhcmFtIHRlbXBsYXRlX210aW1lX2NhY2hlOiB0aGUgZGljdGlvbmFyeSBjYWNoZSBvZiB0ZW1wbGF0ZSBmaWxlIG1vZGlmaWNhdGlvbi10aW1lcwogICAgOnBhcmFtIHRlbXBsYXRlX3ZhbHVlX2NhY2hlOiB0aGUgZGljdGlvbmFyeSBjYWNoZSBvZiB0ZW1wbGF0ZSB2YWx1ZXMKICAgIDpyZXR1cm46IHRoZSBuYW1lcyBvZiB0ZW1wbGF0ZXMgd2hpY2ggY2hhbmdlZAogICAgIiIiCiAgICBjaGFuZ2VkX3RlbXBsYXRlcyA9IFtdCiAgICBmb3IgdGVtcGxhdGVfbmFtZSBpbiB0ZW1wbGF0ZV9uYW1lczoKICAgICAgICBvbGRfbXRpbWUgPSB0ZW1wbGF0ZV9tdGltZV9jYWNoZS5nZXQodGVtcGxhdGVfbmFtZSwgTm9uZSkKICAgICAgICBuZXdfbXRpbWUgPSB0ZW1wbGF0ZV9tdGltZSh0ZW1wbGF0ZV9uYW1lKQogICAgICAgICMgZmlyc3QsIGNoZWNrIGlmIHRoZSBmaWxlcyB3ZXJlIG1vZGlmaWVkCiAgICAgICAgaWYgb2xkX210aW1lICE9IG5ld19tdGltZToKICAgICAgICAgICAgb2xkX3ZhbHVlID0gdGVtcGxhdGVfdmFsdWVfY2FjaGUuZ2V0KHRlbXBsYXRlX25hbWUsIE5vbmUpCiAgICAgICAgICAgIG5ld192YWx1ZSA9IHRlbXBsYXRlX3ZhbHVlKHRlbXBsYXRlX25hbWUpCiAgICAgICAgICAgICMgc2Vjb25kLCBjaGVjayBpZiB0aGUgdmFsdWUgYWN0dWFsbHkgY2hhbmdlZAogICAgICAgICAgICBpZiBvbGRfdmFsdWUgIT0gbmV3X3ZhbHVlOgogICAgICAgICAgICAgICAgdGVtcGxhdGVfdmFsdWVfY2FjaGVbdGVtcGxhdGVfbmFtZV0gPSBuZXdfdmFsdWUKICAgICAgICAgICAgICAgIGNoYW5nZWRfdGVtcGxhdGVzICs9IFt0ZW1wbGF0ZV9uYW1lXQogICAgICAgICAgICB0ZW1wbGF0ZV9tdGltZV9jYWNoZVt0ZW1wbGF0ZV9uYW1lXSA9IG5ld19tdGltZQogICAgcmV0dXJuIGNoYW5nZWRfdGVtcGxhdGVzCgoKZGVmIG1haW4oc3luY19mb3JldmVyOiBib29sKToKICAgICMgaW5pdGlhbCBzeW5jIG9mIHRlbXBsYXRlIGNhY2hlCiAgICByZWZyZXNoX3RlbXBsYXRlX2NhY2hlKAogICAgICAgIHRlbXBsYXRlX25hbWVzPVZBUl9fVEVNUExBVEVfTkFNRVMsCiAgICAgICAgdGVtcGxhdGVfbXRpbWVfY2FjaGU9VkFSX19URU1QTEFURV9NVElNRV9DQUNIRSwKICAgICAgICB0ZW1wbGF0ZV92YWx1ZV9jYWNoZT1WQVJfX1RFTVBMQVRFX1ZBTFVFX0NBQ0hFCiAgICApCgogICAgIyBpbml0aWFsIHN5bmMgb2Ygb2JqZWN0cyBpbnRvIEFpcmZsb3cgREIKICAgIHN5bmNfd2l0aF9haXJmbG93KCkKCiAgICBpZiBzeW5jX2ZvcmV2ZXI6CiAgICAgICAgIyBkZWZpbmUgdmFyaWFibGVzIHVzZWQgdG8gdHJhY2sgaG93IGxvbmcgc2luY2UgbGFzdCByZWZyZXNoL3N5bmMKICAgICAgICB0ZW1wbGF0ZXNfc3luY19lcG9jaCA9IHRpbWUudGltZSgpCiAgICAgICAgb2JqZWN0c19zeW5jX2Vwb2NoID0gdGltZS50aW1lKCkKCiAgICAgICAgIyBtYWluIGxvb3AKICAgICAgICB3aGlsZSBUcnVlOgogICAgICAgICAgICAjIG1vbml0b3IgZm9yIHRlbXBsYXRlIHNlY3JldC9jb25maWdtYXAgdXBkYXRlcwogICAgICAgICAgICBpZiAodGltZS50aW1lKCkgLSB0ZW1wbGF0ZXNfc3luY19lcG9jaCkgPiBDT05GX19URU1QTEFURVNfU1lOQ19JTlRFUlZBTDoKICAgICAgICAgICAgICAgIGxvZ2dpbmcuZGVidWcoZiJ0ZW1wbGF0ZSBzeW5jIGludGVydmFsIHJlYWNoZWQsIHJlLXN5bmNpbmcgYWxsIHRlbXBsYXRlcy4uLiIpCiAgICAgICAgICAgICAgICBjaGFuZ2VkX3RlbXBsYXRlcyA9IHJlZnJlc2hfdGVtcGxhdGVfY2FjaGUoCiAgICAgICAgICAgICAgICAgICAgdGVtcGxhdGVfbmFtZXM9VkFSX19URU1QTEFURV9OQU1FUywKICAgICAgICAgICAgICAgICAgICB0ZW1wbGF0ZV9tdGltZV9jYWNoZT1WQVJfX1RFTVBMQVRFX01USU1FX0NBQ0hFLAogICAgICAgICAgICAgICAgICAgIHRlbXBsYXRlX3ZhbHVlX2NhY2hlPVZBUl9fVEVNUExBVEVfVkFMVUVfQ0FDSEUKICAgICAgICAgICAgICAgICkKICAgICAgICAgICAgICAgIHRlbXBsYXRlc19zeW5jX2Vwb2NoID0gdGltZS50aW1lKCkKICAgICAgICAgICAgICAgIGlmIGNoYW5nZWRfdGVtcGxhdGVzOgogICAgICAgICAgICAgICAgICAgIGxvZ2dpbmcuaW5mbyhmInRlbXBsYXRlIHZhbHVlcyBoYXZlIGNoYW5nZWQ6IFt7JywnLmpvaW4oY2hhbmdlZF90ZW1wbGF0ZXMpfV0iKQogICAgICAgICAgICAgICAgICAgIHN5bmNfd2l0aF9haXJmbG93KCkKICAgICAgICAgICAgICAgICAgICBvYmplY3RzX3N5bmNfZXBvY2ggPSB0aW1lLnRpbWUoKQoKICAgICAgICAgICAgIyBtb25pdG9yIGZvciBleHRlcm5hbCBjaGFuZ2VzIHRvIG9iamVjdHMgKGxpa2UgZnJvbSBVSSkKICAgICAgICAgICAgaWYgKHRpbWUudGltZSgpIC0gb2JqZWN0c19zeW5jX2Vwb2NoKSA+IENPTkZfX09CSkVDVFNfU1lOQ19JTlRFUlZBTDoKICAgICAgICAgICAgICAgIGxvZ2dpbmcuZGVidWcoZiJzeW5jIGludGVydmFsIHJlYWNoZWQsIHJlLXN5bmNpbmcgYWxsIG9iamVjdHMuLi4iKQogICAgICAgICAgICAgICAgc3luY193aXRoX2FpcmZsb3coKQogICAgICAgICAgICAgICAgb2JqZWN0c19zeW5jX2Vwb2NoID0gdGltZS50aW1lKCkKCiAgICAgICAgICAgICMgZW5zdXJlIHdlIGRvbnQgbG9vcCB0b28gZmFzdAogICAgICAgICAgICB0aW1lLnNsZWVwKDAuNSkKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKIyMjIyBFTkQ6IEdMT0JBTCBDT0RFICMjIyMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKCgojIyMjIyMjIyMjIyMjCiMjIEltcG9ydHMgIyMKIyMjIyMjIyMjIyMjIwppbXBvcnQgc3lzCmZyb20gd2Vya3pldWcuc2VjdXJpdHkgaW1wb3J0IGNoZWNrX3Bhc3N3b3JkX2hhc2gsIGdlbmVyYXRlX3Bhc3N3b3JkX2hhc2gKaW1wb3J0IGFpcmZsb3cud3d3LmFwcCBhcyB3d3dfYXBwCmZsYXNrX2FwcCA9IHd3d19hcHAuY3JlYXRlX2FwcCgpCmZsYXNrX2FwcGJ1aWxkZXIgPSBmbGFza19hcHAuYXBwYnVpbGRlcgoKIyBhaXJmbG93IHVzZXMgaXRzIG93biBpbmNvbXBhdGlibGUgRkFCIG1vZGVscyBpbiAyLjMuMCsKdHJ5OgogIGZyb20gYWlyZmxvdy53d3cuZmFiX3NlY3VyaXR5LnNxbGEubW9kZWxzIGltcG9ydCBVc2VyLCBSb2xlCmV4Y2VwdCBNb2R1bGVOb3RGb3VuZEVycm9yOgogIGZyb20gZmxhc2tfYXBwYnVpbGRlci5zZWN1cml0eS5zcWxhLm1vZGVscyBpbXBvcnQgVXNlciwgUm9sZQoKCiMjIyMjIyMjIyMjIyMKIyMgQ2xhc3NlcyAjIwojIyMjIyMjIyMjIyMjCmNsYXNzIFVzZXJXcmFwcGVyKG9iamVjdCk6CiAgICBkZWYgX19pbml0X18oCiAgICAgICAgICAgIHNlbGYsCiAgICAgICAgICAgIHVzZXJuYW1lOiBzdHIsCiAgICAgICAgICAgIGZpcnN0X25hbWU6IE9wdGlvbmFsW3N0cl0gPSBOb25lLAogICAgICAgICAgICBsYXN0X25hbWU6IE9wdGlvbmFsW3N0cl0gPSBOb25lLAogICAgICAgICAgICBlbWFpbDogT3B0aW9uYWxbc3RyXSA9IE5vbmUsCiAgICAgICAgICAgIHJvbGVzOiBPcHRpb25hbFtMaXN0W3N0cl1dID0gTm9uZSwKICAgICAgICAgICAgcGFzc3dvcmQ6IE9wdGlvbmFsW3N0cl0gPSBOb25lCiAgICApOgogICAgICAgIHNlbGYudXNlcm5hbWUgPSB1c2VybmFtZQogICAgICAgIHNlbGYuX2ZpcnN0X25hbWUgPSBmaXJzdF9uYW1lCiAgICAgICAgc2VsZi5fbGFzdF9uYW1lID0gbGFzdF9uYW1lCiAgICAgICAgc2VsZi5fZW1haWwgPSBlbWFpbAogICAgICAgIHNlbGYucm9sZXMgPSByb2xlcwogICAgICAgIHNlbGYuX3Bhc3N3b3JkID0gcGFzc3dvcmQKCiAgICBAcHJvcGVydHkKICAgIGRlZiBmaXJzdF9uYW1lKHNlbGYpIC0+IHN0cjoKICAgICAgICByZXR1cm4gc3RyaW5nX3N1YnN0aXR1dGlvbihzZWxmLl9maXJzdF9uYW1lLCBWQVJfX1RFTVBMQVRFX1ZBTFVFX0NBQ0hFKQoKICAgIEBwcm9wZXJ0eQogICAgZGVmIGxhc3RfbmFtZShzZWxmKSAtPiBzdHI6CiAgICAgICAgcmV0dXJuIHN0cmluZ19zdWJzdGl0dXRpb24oc2VsZi5fbGFzdF9uYW1lLCBWQVJfX1RFTVBMQVRFX1ZBTFVFX0NBQ0hFKQoKICAgIEBwcm9wZXJ0eQogICAgZGVmIGVtYWlsKHNlbGYpIC0+IHN0cjoKICAgICAgICByZXR1cm4gc3RyaW5nX3N1YnN0aXR1dGlvbihzZWxmLl9lbWFpbCwgVkFSX19URU1QTEFURV9WQUxVRV9DQUNIRSkKCiAgICBAcHJvcGVydHkKICAgIGRlZiBwYXNzd29yZChzZWxmKSAtPiBzdHI6CiAgICAgICAgcmV0dXJuIHN0cmluZ19zdWJzdGl0dXRpb24oc2VsZi5fcGFzc3dvcmQsIFZBUl9fVEVNUExBVEVfVkFMVUVfQ0FDSEUpCgogICAgZGVmIGFzX2RpY3Qoc2VsZikgLT4gRGljdFtzdHIsIHN0cl06CiAgICAgICAgcmV0dXJuIHsKICAgICAgICAgICAgInVzZXJuYW1lIjogc2VsZi51c2VybmFtZSwKICAgICAgICAgICAgImZpcnN0X25hbWUiOiBzZWxmLmZpcnN0X25hbWUsCiAgICAgICAgICAgICJsYXN0X25hbWUiOiBzZWxmLmxhc3RfbmFtZSwKICAgICAgICAgICAgImVtYWlsIjogc2VsZi5lbWFpbCwKICAgICAgICAgICAgInJvbGVzIjogW2ZpbmRfcm9sZShyb2xlX25hbWU9cm9sZV9uYW1lKSBmb3Igcm9sZV9uYW1lIGluIHNlbGYucm9sZXNdLAogICAgICAgICAgICAicGFzc3dvcmQiOiBzZWxmLnBhc3N3b3JkCiAgICAgICAgfQoKCiMjIyMjIyMjIyMjIyMjIwojIyBWYXJpYWJsZXMgIyMKIyMjIyMjIyMjIyMjIyMjClZBUl9fVEVNUExBVEVfTkFNRVMgPSBbCl0KVkFSX19URU1QTEFURV9NVElNRV9DQUNIRSA9IHt9ClZBUl9fVEVNUExBVEVfVkFMVUVfQ0FDSEUgPSB7fQpWQVJfX1VTRVJfV1JBUFBFUlMgPSB7CiAgImFkbWluIjogVXNlcldyYXBwZXIoCiAgICB1c2VybmFtZT0iYWRtaW4iLAogICAgZmlyc3RfbmFtZT0iYWRtaW4iLAogICAgbGFzdF9uYW1lPSJhZG1pbiIsCiAgICBlbWFpbD0iYWRtaW5AZXhhbXBsZS5jb20iLAogICAgcm9sZXM9WyAgICAgICAgIkFkbWluIiwKICAgIF0sCiAgICBwYXNzd29yZD0iYWRtaW4iLAogICksCn0KCgojIyMjIyMjIyMjIyMjIyMKIyMgRnVuY3Rpb25zICMjCiMjIyMjIyMjIyMjIyMjIwpkZWYgZmluZF9yb2xlKHJvbGVfbmFtZTogc3RyKSAtPiBSb2xlOgogICAgIiIiCiAgICBHZXQgdGhlIEZBQiBSb2xlIG1vZGVsIGFzc29jaWF0ZWQgd2l0aCBhIGByb2xlX25hbWVgLgogICAgIiIiCiAgICBmb3VuZF9yb2xlID0gZmxhc2tfYXBwYnVpbGRlci5zbS5maW5kX3JvbGUocm9sZV9uYW1lKQogICAgaWYgZm91bmRfcm9sZToKICAgICAgICByZXR1cm4gZm91bmRfcm9sZQogICAgZWxzZToKICAgICAgICB2YWxpZF9yb2xlcyA9IGZsYXNrX2FwcGJ1aWxkZXIuc20uZ2V0X2FsbF9yb2xlcygpCiAgICAgICAgbG9nZ2luZy5lcnJvcihmIkZhaWxlZCB0byBmaW5kIHJvbGU9YHtyb2xlX25hbWV9YCwgdmFsaWQgcm9sZXMgYXJlOiB7dmFsaWRfcm9sZXN9IikKICAgICAgICBzeXMuZXhpdCgxKQoKCmRlZiBjb21wYXJlX3JvbGVfbGlzdHMocm9sZV9saXN0XzE6IExpc3RbUm9sZV0sIHJvbGVfbGlzdF8yOiBMaXN0W1JvbGVdKSAtPiBib29sOgogICAgIiIiCiAgICBDaGVjayBpZiB0d28gbGlzdHMgb2YgRkFCIFJvbGVzIGNvbnRhaW4gdGhlIHNhbWUgcm9sZXMgKGlnbm9yZXMgZHVwbGljYXRlcyBhbmQgb3JkZXIpLgogICAgIiIiCiAgICBuYW1lX3NldF8xID0gc2V0KHJvbGUubmFtZSBmb3Igcm9sZSBpbiByb2xlX2xpc3RfMSkKICAgIG5hbWVfc2V0XzIgPSBzZXQocm9sZS5uYW1lIGZvciByb2xlIGluIHJvbGVfbGlzdF8yKQogICAgcmV0dXJuIG5hbWVfc2V0XzEgPT0gbmFtZV9zZXRfMgoKCgpkZWYgY29tcGFyZV91c2Vycyh1c2VyX2RpY3Q6IERpY3QsIHVzZXJfbW9kZWw6IFVzZXIpIC0+IGJvb2w6CiAgICAiIiIKICAgIENoZWNrIGlmIHVzZXIgaW5mbyAoc3RvcmVkIGluIGRpY3QpIGlzIGlkZW50aWNhbCB0byBhIEZBQiBVc2VyIG1vZGVsLgogICAgIiIiCiAgICByZXR1cm4gKAogICAgICAgICAgICB1c2VyX2RpY3RbInVzZXJuYW1lIl0gPT0gdXNlcl9tb2RlbC51c2VybmFtZQogICAgICAgICAgICBhbmQgdXNlcl9kaWN0WyJmaXJzdF9uYW1lIl0gPT0gdXNlcl9tb2RlbC5maXJzdF9uYW1lCiAgICAgICAgICAgIGFuZCB1c2VyX2RpY3RbImxhc3RfbmFtZSJdID09IHVzZXJfbW9kZWwubGFzdF9uYW1lCiAgICAgICAgICAgIGFuZCB1c2VyX2RpY3RbImVtYWlsIl0gPT0gdXNlcl9tb2RlbC5lbWFpbAogICAgICAgICAgICBhbmQgY29tcGFyZV9yb2xlX2xpc3RzKHVzZXJfZGljdFsicm9sZXMiXSwgdXNlcl9tb2RlbC5yb2xlcykKICAgICAgICAgICAgYW5kIGNoZWNrX3Bhc3N3b3JkX2hhc2gocHdoYXNoPXVzZXJfbW9kZWwucGFzc3dvcmQsIHBhc3N3b3JkPXVzZXJfZGljdFsicGFzc3dvcmQiXSkKICAgICkKCgpkZWYgc3luY191c2VyKHVzZXJfd3JhcHBlcjogVXNlcldyYXBwZXIpIC0+IE5vbmU6CiAgICAiIiIKICAgIFN5bmMgdGhlIFVzZXIgZGVmaW5lZCBieSBhIHByb3ZpZGVkIFVzZXJXcmFwcGVyIGludG8gdGhlIEZBQiBEQi4KICAgICIiIgogICAgdXNlcm5hbWUgPSB1c2VyX3dyYXBwZXIudXNlcm5hbWUKICAgIHVfbmV3ID0gdXNlcl93cmFwcGVyLmFzX2RpY3QoKQogICAgdV9vbGQgPSBmbGFza19hcHBidWlsZGVyLnNtLmZpbmRfdXNlcih1c2VybmFtZT11c2VybmFtZSkKCiAgICBpZiBub3QgdV9vbGQ6CiAgICAgICAgbG9nZ2luZy5pbmZvKGYiVXNlcj1ge3VzZXJuYW1lfWAgaXMgbWlzc2luZywgYWRkaW5nLi4uIikKICAgICAgICBjcmVhdGVkX3VzZXIgPSBmbGFza19hcHBidWlsZGVyLnNtLmFkZF91c2VyKAogICAgICAgICAgICB1c2VybmFtZT11X25ld1sidXNlcm5hbWUiXSwKICAgICAgICAgICAgZmlyc3RfbmFtZT11X25ld1siZmlyc3RfbmFtZSJdLAogICAgICAgICAgICBsYXN0X25hbWU9dV9uZXdbImxhc3RfbmFtZSJdLAogICAgICAgICAgICBlbWFpbD11X25ld1siZW1haWwiXSwKICAgICAgICAgICAgIyBpbiBvbGQgdmVyc2lvbnMgb2YgZmxhc2tfYXBwYnVpbGRlciBgYWRkX3VzZXIocm9sZT1gIGNhbiBvbmx5IGFkZCBleGFjdGx5IG9uZSByb2xlCiAgICAgICAgICAgICMgKHVuY2hlY2tlZCAwIGluZGV4IGlzIHNhZmUgYmVjYXVzZSB3ZSByZXF1aXJlIGF0IGxlYXN0IG9uZSByb2xlIHVzaW5nIGhlbG0gdmFsdWVzIHZhbGlkYXRpb24pCiAgICAgICAgICAgIHJvbGU9dV9uZXdbInJvbGVzIl1bMF0sCiAgICAgICAgICAgIHBhc3N3b3JkPXVfbmV3WyJwYXNzd29yZCJdCiAgICAgICAgKQogICAgICAgIGlmIGNyZWF0ZWRfdXNlcjoKICAgICAgICAgICAgIyBhZGQgdGhlIGZ1bGwgbGlzdCBvZiByb2xlcyAod2Ugb25seSBhZGRlZCB0aGUgZmlyc3Qgb25lIGFib3ZlKQogICAgICAgICAgICBjcmVhdGVkX3VzZXIucm9sZXMgPSB1X25ld1sicm9sZXMiXQogICAgICAgICAgICBsb2dnaW5nLmluZm8oZiJVc2VyPWB7dXNlcm5hbWV9YCB3YXMgc3VjY2Vzc2Z1bGx5IGFkZGVkLiIpCiAgICAgICAgZWxzZToKICAgICAgICAgICAgbG9nZ2luZy5lcnJvcihmIkZhaWxlZCB0byBhZGQgVXNlcj1ge3VzZXJuYW1lfWAiKQogICAgICAgICAgICBzeXMuZXhpdCgxKQogICAgZWxzZToKICAgICAgICBpZiBjb21wYXJlX3VzZXJzKHVfbmV3LCB1X29sZCk6CiAgICAgICAgICAgIHBhc3MKICAgICAgICBlbHNlOgogICAgICAgICAgICBsb2dnaW5nLmluZm8oZiJVc2VyPWB7dXNlcm5hbWV9YCBleGlzdHMgYnV0IGhhcyBjaGFuZ2VkLCB1cGRhdGluZy4uLiIpCiAgICAgICAgICAgIHVfb2xkLmZpcnN0X25hbWUgPSB1X25ld1siZmlyc3RfbmFtZSJdCiAgICAgICAgICAgIHVfb2xkLmxhc3RfbmFtZSA9IHVfbmV3WyJsYXN0X25hbWUiXQogICAgICAgICAgICB1X29sZC5lbWFpbCA9IHVfbmV3WyJlbWFpbCJdCiAgICAgICAgICAgIHVfb2xkLnJvbGVzID0gdV9uZXdbInJvbGVzIl0KICAgICAgICAgICAgdV9vbGQucGFzc3dvcmQgPSBnZW5lcmF0ZV9wYXNzd29yZF9oYXNoKHVfbmV3WyJwYXNzd29yZCJdKQogICAgICAgICAgICAjIHN0cmFuZ2UgY2hlY2sgZm9yIEZhbHNlIGlzIGJlY2F1c2UgdXBkYXRlX3VzZXIoKSByZXR1cm5zIE5vbmUgZm9yIHN1Y2Nlc3MKICAgICAgICAgICAgIyBidXQgaW4gZnV0dXJlIG1pZ2h0IHJldHVybiB0aGUgVXNlciBtb2RlbAogICAgICAgICAgICBpZiBub3QgKGZsYXNrX2FwcGJ1aWxkZXIuc20udXBkYXRlX3VzZXIodV9vbGQpIGlzIEZhbHNlKToKICAgICAgICAgICAgICAgIGxvZ2dpbmcuaW5mbyhmIlVzZXI9YHt1c2VybmFtZX1gIHdhcyBzdWNjZXNzZnVsbHkgdXBkYXRlZC4iKQogICAgICAgICAgICBlbHNlOgogICAgICAgICAgICAgICAgbG9nZ2luZy5lcnJvcihmIkZhaWxlZCB0byB1cGRhdGUgVXNlcj1ge3VzZXJuYW1lfWAiKQogICAgICAgICAgICAgICAgc3lzLmV4aXQoMSkKCgpkZWYgc3luY19hbGxfdXNlcnModXNlcl93cmFwcGVyczogRGljdFtzdHIsIFVzZXJXcmFwcGVyXSkgLT4gTm9uZToKICAgICIiIgogICAgU3luYyBhbGwgdXNlcnMgaW4gcHJvdmlkZWQgYHVzZXJfd3JhcHBlcnNgLgogICAgIiIiCiAgICBsb2dnaW5nLmluZm8oIkJFR0lOOiBhaXJmbG93IHVzZXJzIHN5bmMiKQogICAgZm9yIHVzZXJfd3JhcHBlciBpbiB1c2VyX3dyYXBwZXJzLnZhbHVlcygpOgogICAgICAgIHN5bmNfdXNlcih1c2VyX3dyYXBwZXIpCiAgICBsb2dnaW5nLmluZm8oIkVORDogYWlyZmxvdyB1c2VycyBzeW5jIikKCiAgICAjIGVuc3VyZXMgdGhhbiBhbnkgU1FMQWxjaGVteSBzZXNzaW9ucyBhcmUgY2xvc2VkIChzbyB3ZSBkb24ndCBob2xkIGEgY29ubmVjdGlvbiB0byB0aGUgZGF0YWJhc2UpCiAgICBmbGFza19hcHAuZG9fdGVhcmRvd25fYXBwY29udGV4dCgpCgoKZGVmIHN5bmNfd2l0aF9haXJmbG93KCkgLT4gTm9uZToKICAgICIiIgogICAgUHJlZm9ybSBhIHN5bmMgb2YgYWxsIG9iamVjdHMgd2l0aCBhaXJmbG93IChub3RlLCBgc3luY193aXRoX2FpcmZsb3coKWAgaXMgY2FsbGVkIGluIGBtYWluKClgIHRlbXBsYXRlKS4KICAgICIiIgogICAgc3luY19hbGxfdXNlcnModXNlcl93cmFwcGVycz1WQVJfX1VTRVJfV1JBUFBFUlMpCgoKIyMjIyMjIyMjIyMjIyMKIyMgUnVuIE1haW4gIyMKIyMjIyMjIyMjIyMjIyMKbWFpbihzeW5jX2ZvcmV2ZXI9VHJ1ZSk="
+---
+# Source: airflow/templates/config/configmap-pod-template.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-pod-template
+  labels:
+    app: airflow
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+data:
+  pod_template.yaml: |-
+    
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: dummy-name
+    spec:
+      restartPolicy: Never
+      serviceAccountName: airflow
+      shareProcessNamespace: false
+      nodeSelector:
+        {}
+      affinity:
+        {}
+      tolerations:
+        []
+      securityContext:
+        fsGroup: 0
+      containers:
+        - name: base      
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          envFrom:        
+            - secretRef:
+                name: airflow-config-envs
+          env:
+            ## KubernetesExecutor Pods use LocalExecutor internally
+            - name: AIRFLOW__CORE__EXECUTOR
+              value: LocalExecutor        
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "20"
+          ports: []
+          command: []
+          args: []
+          volumeMounts:        
+            - name: logs-data
+              mountPath: /opt/airflow/logs
+      volumes:    
+        - name: logs-data
+          emptyDir: {}
+---
+# Source: airflow/templates/rbac/airflow-role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: airflow
+  labels:
+    app: airflow
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - "get"
+  - "list"
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - "create"
+  - "get"
+  - "delete"
+  - "list"
+  - "patch"
+  - "watch"
+- apiGroups:
+  - ""
+  resources:
+  - "pods/log"
+  verbs:
+  - "get"
+  - "list"
+- apiGroups:
+  - ""
+  resources:
+  - "pods/exec"
+  verbs:
+  - "create"
+  - "get"
+---
+# Source: airflow/templates/rbac/airflow-rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: airflow
+  labels:
+    app: airflow
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: airflow
+subjects:
+- kind: ServiceAccount
+  name: airflow
+  namespace: airflow
+---
+# Source: airflow/charts/postgresql/templates/svc-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow-postgresql-headless
+  labels:
+    app: postgresql
+    chart: postgresql-8.6.4
+    release: "airflow"
+    heritage: "Helm"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  selector:
+    app: postgresql
+    release: "airflow"
+---
+# Source: airflow/charts/postgresql/templates/svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow-postgresql
+  labels:
+    app: postgresql
+    chart: postgresql-8.6.4
+    release: "airflow"
+    heritage: "Helm"
+spec:
+  type: ClusterIP
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  selector:
+    app: postgresql
+    release: "airflow"
+    role: master
+---
+# Source: airflow/templates/pgbouncer/pgbouncer-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow-pgbouncer
+  labels:
+    app: airflow
+    component: pgbouncer
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+spec:
+  type: ClusterIP
+  selector:
+    app: airflow
+    component: pgbouncer
+    release: airflow
+  ports:
+    - name: pgbouncer
+      protocol: TCP
+      port: 6432
+---
+# Source: airflow/templates/webserver/webserver-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow-web
+  labels:
+    app: airflow
+    component: web
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+spec:
+  type: ClusterIP
+  selector:
+    app: airflow
+    component: web
+    release: airflow
+  sessionAffinity: None
+  ports:
+    - name: web
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+# Source: airflow/templates/db-migrations/db-migrations-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-db-migrations
+  labels:
+    app: airflow
+    component: db-migrations
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+spec:
+  replicas: 1
+  strategy:
+    ## only 1 replica should run at a time
+    type: Recreate
+  selector:
+    matchLabels:
+      app: airflow
+      component: db-migrations
+      release: airflow
+  template:
+    metadata:
+      annotations:
+        checksum/secret-config-envs: 4804aefbb403fe7afd8eb8154a2bff7edeb2700f48d7dc3d8f3d4a65dde8c737
+        checksum/secret-local-settings: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        checksum/db-migrations-script: 37898f38b90abd06081105d992362ec9e0d0015123b69e758e59031a9e6ddfc9
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      labels:
+        app: airflow
+        component: db-migrations
+        release: airflow
+    spec:
+      restartPolicy: Always
+      nodeSelector:
+        {}
+      affinity:
+        {}
+      tolerations:
+        []
+      securityContext:
+        fsGroup: 0
+      serviceAccountName: airflow
+      initContainers:        
+        - name: check-db  
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          envFrom:    
+            - secretRef:
+                name: airflow-config-envs
+          env:    
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:    
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "bash"
+            - "-c"
+            - "exec timeout 60s airflow db check"
+          volumeMounts:    
+            - name: logs-data
+              mountPath: /opt/airflow/logs
+      containers:
+        - name: db-migrations          
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          resources:
+            {}
+          envFrom:            
+            - secretRef:
+                name: airflow-config-envs
+          env:            
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:            
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "python"
+            - "-u"
+            - "/mnt/scripts/db_migrations.py"
+          volumeMounts:            
+            - name: logs-data
+              mountPath: /opt/airflow/logs
+            - name: scripts
+              mountPath: /mnt/scripts
+              readOnly: true
+      volumes:        
+        - name: logs-data
+          emptyDir: {}
+        - name: scripts
+          secret:
+            secretName: airflow-db-migrations
+---
+# Source: airflow/templates/pgbouncer/pgbouncer-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-pgbouncer
+  labels:
+    app: airflow
+    component: pgbouncer
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      ## multiple pgbouncer pods can safely run concurrently
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: airflow
+      component: pgbouncer
+      release: airflow
+  template:
+    metadata:
+      annotations:
+        checksum/secret-config-envs: 4804aefbb403fe7afd8eb8154a2bff7edeb2700f48d7dc3d8f3d4a65dde8c737
+        checksum/secret-pgbouncer: e6271c750a6580256adf79b243badf633c71cbf1da3a0852424bfb8a8ced9675
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      labels:
+        app: airflow
+        component: pgbouncer
+        release: airflow
+    spec:
+      restartPolicy: Always
+      nodeSelector:
+        {}
+      affinity:
+        {}
+      tolerations:
+        []
+      securityContext:
+        fsGroup: 0
+      terminationGracePeriodSeconds: 120
+      serviceAccountName: airflow
+      containers:
+        - name: pgbouncer
+          image: ghcr.io/airflow-helm/pgbouncer:1.18.0-patch.1
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
+          resources:
+            {}
+          envFrom:            
+            - secretRef:
+                name: airflow-config-envs
+          env:            
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          ports:
+            - name: pgbouncer
+              containerPort: 6432
+              protocol: TCP
+          command:
+            - "/usr/bin/dumb-init"
+            ## rewrite SIGTERM as SIGINT, so pgbouncer does a safe shutdown
+            - "--rewrite=15:2"
+            - "--"
+          args:
+            - "/bin/sh"
+            - "-c"
+            ## we generate users.txt on startup, because DATABASE_PASSWORD is defined from a Secret,
+            ## and we want to pickup the new values on container restart (possibly due to livenessProbe failure)
+            - |-
+              /home/pgbouncer/config/gen_self_signed_cert.sh && \
+              /home/pgbouncer/config/gen_auth_file.sh && \
+              exec pgbouncer /home/pgbouncer/config/pgbouncer.ini
+          livenessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 30
+            timeoutSeconds: 60
+            failureThreshold: 3
+            exec:
+              command:
+                - "/bin/sh"
+                - "-c"
+                ## this check is intended to fail when the DATABASE_PASSWORD secret is updated,
+                ## which would cause `gen_auth_file.sh` to run again on container start
+                - psql $(eval $DATABASE_PSQL_CMD) --tuples-only --command="SELECT 1;" | grep -q "1"
+          startupProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 15
+            failureThreshold: 30
+            tcpSocket:
+              port: 6432
+          volumeMounts:
+            - name: pgbouncer-config
+              mountPath: /home/pgbouncer/config
+              readOnly: true
+            - name: pgbouncer-certs
+              mountPath: /home/pgbouncer/certs
+              readOnly: true
+      volumes:
+        - name: pgbouncer-config
+          secret:
+            secretName: airflow-pgbouncer
+            items:
+              - key: gen_auth_file.sh
+                path: gen_auth_file.sh
+                mode: 0755
+              - key: gen_self_signed_cert.sh
+                path: gen_self_signed_cert.sh
+                mode: 0755
+              - key: pgbouncer.ini
+                path: pgbouncer.ini
+        - name: pgbouncer-certs
+          projected:
+            sources:
+---
+# Source: airflow/templates/scheduler/scheduler-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-scheduler
+  labels:
+    app: airflow
+    component: scheduler
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      ## multiple schedulers can run concurrently (Airflow 2.0)
+      maxSurge: 25%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: airflow
+      component: scheduler
+      release: airflow
+  template:
+    metadata:
+      annotations:
+        checksum/secret-config-envs: 4804aefbb403fe7afd8eb8154a2bff7edeb2700f48d7dc3d8f3d4a65dde8c737
+        checksum/secret-local-settings: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        checksum/config-pod-template: 2e8d42bc94d6c615f1c7231e9c349227a2c12f156caecf72c0965ac07932583c
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      labels:
+        app: airflow
+        component: scheduler
+        release: airflow
+    spec:
+      restartPolicy: Always
+      nodeSelector:
+        {}
+      affinity:
+        {}
+      tolerations:
+        []
+      securityContext:
+        fsGroup: 0
+      serviceAccountName: airflow
+      initContainers:        
+        - name: check-db  
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          envFrom:    
+            - secretRef:
+                name: airflow-config-envs
+          env:    
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:    
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "bash"
+            - "-c"
+            - "exec timeout 60s airflow db check"
+          volumeMounts:    
+            - name: logs-data
+              mountPath: /opt/airflow/logs        
+        - name: wait-for-db-migrations  
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          envFrom:    
+            - secretRef:
+                name: airflow-config-envs
+          env:    
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:    
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "bash"
+            - "-c"
+            - "exec airflow db check-migrations -t 60"
+          volumeMounts:    
+            - name: logs-data
+              mountPath: /opt/airflow/logs
+      containers:
+        - name: airflow-scheduler          
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          resources:
+            {}
+          envFrom:            
+            - secretRef:
+                name: airflow-config-envs
+          env:            
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:            
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "bash"
+            - "-c"
+            - "exec airflow scheduler -n -1"
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            failureThreshold: 5
+            timeoutSeconds: 60
+            exec:
+              command:                
+                - "/usr/bin/dumb-init"
+                - "--"
+                - "/entrypoint"
+                - "python"
+                - "-Wignore"
+                - "-c"
+                - |
+                  import os
+                  import sys
+
+                  # suppress logs triggered from importing airflow packages
+                  os.environ["AIRFLOW__LOGGING__LOGGING_LEVEL"] = "ERROR"
+
+                  # shared imports
+                  try:
+                      from airflow.jobs.job import Job
+                  except ImportError:
+                      # `BaseJob` was renamed to `Job` in airflow 2.6.0
+                      from airflow.jobs.base_job import BaseJob as Job
+                  from airflow.utils.db import create_session
+                  from airflow.utils.net import get_hostname
+
+                  # heartbeat check imports
+                  try:
+                      from airflow.jobs.scheduler_job_runner import SchedulerJobRunner
+                  except ImportError:
+                      # `SchedulerJob` is wrapped by `SchedulerJobRunner` since airflow 2.6.0
+                      from airflow.jobs.scheduler_job import SchedulerJob as SchedulerJobRunner
+
+                  with create_session() as session:
+                      ########################
+                      # heartbeat check
+                      ########################
+                      # ensure the SchedulerJob with most recent heartbeat for this `hostname` is alive
+                      hostname = get_hostname()
+                      scheduler_job = session \
+                          .query(Job) \
+                          .filter_by(job_type=SchedulerJobRunner.job_type) \
+                          .filter_by(hostname=hostname) \
+                          .order_by(Job.latest_heartbeat.desc()) \
+                          .limit(1) \
+                          .first()
+                      if (scheduler_job is not None) and scheduler_job.is_alive():
+                          pass
+                      else:
+                          sys.exit(f"The SchedulerJob (id={scheduler_job.id}) for hostname '{hostname}' is not alive")
+          volumeMounts:            
+            - name: logs-data
+              mountPath: /opt/airflow/logs
+            - name: pod-template
+              mountPath: /opt/airflow/pod_templates/pod_template.yaml
+              subPath: pod_template.yaml
+              readOnly: true        
+        - name: log-cleanup  
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          resources:
+            {}
+          envFrom:    
+            - secretRef:
+                name: airflow-config-envs
+          env:
+            - name: LOG_PATH
+              value: "/opt/airflow/logs"
+            - name: RETENTION_MINUTES
+              value: "21600"
+            - name: INTERVAL_SECONDS
+              value: "900"    
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:    
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "bash"
+            - "-c"
+            - |
+              set -euo pipefail
+        
+              # break the infinite loop when we receive SIGINT or SIGTERM
+              trap "exit 0" SIGINT SIGTERM
+        
+              while true; do
+                START_EPOCH=$(date --utc +%s)
+                echo "[$(date --utc +%FT%T.%3N)] deleting log files older than $RETENTION_MINUTES minutes..."
+        
+                # delete all writable files ending in ".log" with modified-time older than $RETENTION_MINUTES
+                # NOTE: `-printf "."` prints a "." for each deleted file, which we count the bytes of with `wc -c`
+                DELETED_COUNT=$(
+                  find "$LOG_PATH" \
+                    -type f \
+                    -name "*.log" \
+                    -mmin +"$RETENTION_MINUTES" \
+                    -writable \
+                    -delete \
+                    -printf "." \
+                  | wc -c
+                )
+        
+                END_EPOCH=$(date --utc +%s)
+                LOOP_DURATION=$((END_EPOCH - START_EPOCH))
+                echo "[$(date --utc +%FT%T.%3N)] deleted $DELETED_COUNT files in $LOOP_DURATION seconds"
+        
+                SECONDS_TO_SLEEP=$((INTERVAL_SECONDS - LOOP_DURATION))
+                if (( SECONDS_TO_SLEEP > 0 )); then
+                  echo "[$(date --utc +%FT%T.%3N)] waiting $SECONDS_TO_SLEEP seconds..."
+                  sleep $SECONDS_TO_SLEEP
+                fi
+              done
+          volumeMounts:
+            - name: logs-data
+              mountPath: /opt/airflow/logs
+      volumes:        
+        - name: logs-data
+          emptyDir: {}
+        - name: pod-template
+          configMap:
+            name: airflow-pod-template
+---
+# Source: airflow/templates/sync/sync-users-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-sync-users
+  labels:
+    app: airflow
+    component: sync-users
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+spec:
+  replicas: 1
+  strategy:
+    ## only 1 replica should run at a time
+    type: Recreate
+  selector:
+    matchLabels:
+      app: airflow
+      component: sync-users
+      release: airflow
+  template:
+    metadata:
+      annotations:
+        checksum/secret-config-envs: 4804aefbb403fe7afd8eb8154a2bff7edeb2700f48d7dc3d8f3d4a65dde8c737
+        checksum/secret-local-settings: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        checksum/sync-users-script: 08d39f38a4119e738bb6631335c8d7135f986300b8547375511a39948a26b223
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      labels:
+        app: airflow
+        component: sync-users
+        release: airflow
+    spec:
+      restartPolicy: Always
+      nodeSelector:
+        {}
+      affinity:
+        {}
+      tolerations:
+        []
+      securityContext:
+        fsGroup: 0
+      serviceAccountName: airflow
+      initContainers:        
+        - name: check-db  
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          envFrom:    
+            - secretRef:
+                name: airflow-config-envs
+          env:    
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:    
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "bash"
+            - "-c"
+            - "exec timeout 60s airflow db check"
+          volumeMounts:    
+            - name: logs-data
+              mountPath: /opt/airflow/logs        
+        - name: wait-for-db-migrations  
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          envFrom:    
+            - secretRef:
+                name: airflow-config-envs
+          env:    
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:    
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "bash"
+            - "-c"
+            - "exec airflow db check-migrations -t 60"
+          volumeMounts:    
+            - name: logs-data
+              mountPath: /opt/airflow/logs
+      containers:
+        - name: sync-airflow-users          
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          resources:
+            {}
+          envFrom:            
+            - secretRef:
+                name: airflow-config-envs
+          env:            
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:            
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "python"
+            - "-u"
+            - "/mnt/scripts/sync_users.py"
+          volumeMounts:            
+            - name: logs-data
+              mountPath: /opt/airflow/logs
+            - name: scripts
+              mountPath: /mnt/scripts
+              readOnly: true
+      volumes:        
+        - name: logs-data
+          emptyDir: {}
+        - name: scripts
+          secret:
+            secretName: airflow-sync-users
+---
+# Source: airflow/templates/triggerer/triggerer-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-triggerer
+  labels:
+    app: airflow
+    component: triggerer
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      ## multiple triggerer pods can safely run concurrently
+      maxSurge: 25%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: airflow
+      component: triggerer
+      release: airflow
+  template:
+    metadata:
+      annotations:
+        checksum/secret-config-envs: 4804aefbb403fe7afd8eb8154a2bff7edeb2700f48d7dc3d8f3d4a65dde8c737
+        checksum/secret-local-settings: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      labels:
+        app: airflow
+        component: triggerer
+        release: airflow
+    spec:
+      restartPolicy: Always
+      nodeSelector:
+        {}
+      affinity:
+        {}
+      tolerations:
+        []
+      serviceAccountName: airflow
+      securityContext:
+        fsGroup: 0
+      initContainers:        
+        - name: check-db  
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          envFrom:    
+            - secretRef:
+                name: airflow-config-envs
+          env:    
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:    
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "bash"
+            - "-c"
+            - "exec timeout 60s airflow db check"
+          volumeMounts:    
+            - name: logs-data
+              mountPath: /opt/airflow/logs        
+        - name: wait-for-db-migrations  
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          envFrom:    
+            - secretRef:
+                name: airflow-config-envs
+          env:    
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:    
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "bash"
+            - "-c"
+            - "exec airflow db check-migrations -t 60"
+          volumeMounts:    
+            - name: logs-data
+              mountPath: /opt/airflow/logs
+      containers:
+        - name: airflow-triggerer          
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          resources:
+            {}
+          envFrom:            
+            - secretRef:
+                name: airflow-config-envs
+          env:            
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:            
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "bash"
+            - "-c"
+            - "exec airflow triggerer"
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 60
+            failureThreshold: 5
+            exec:
+              command:                
+                - "/usr/bin/dumb-init"
+                - "--"
+                - "/entrypoint"
+                - "python"
+                - "-Wignore"
+                - "-c"
+                - |
+                  import os
+                  import sys
+
+                  # suppress logs triggered from importing airflow packages
+                  os.environ["AIRFLOW__LOGGING__LOGGING_LEVEL"] = "ERROR"
+
+                  # shared imports
+                  try:
+                      from airflow.jobs.job import Job
+                  except ImportError:
+                      # `BaseJob` was renamed to `Job` in airflow 2.6.0
+                      from airflow.jobs.base_job import BaseJob as Job
+                  from airflow.utils.db import create_session
+                  from airflow.utils.net import get_hostname
+
+                  # heartbeat check imports
+                  try:
+                      from airflow.jobs.triggerer_job_runner import TriggererJobRunner
+                  except ImportError:
+                      # `TriggererJob` is wrapped by `TriggererJobRunner` since airflow 2.6.0
+                      from airflow.jobs.triggerer_job import TriggererJob as TriggererJobRunner
+
+                  with create_session() as session:
+                      # ensure the TriggererJob with most recent heartbeat for this `hostname` is alive
+                      hostname = get_hostname()
+                      triggerer_job = session \
+                          .query(Job) \
+                          .filter_by(job_type=TriggererJobRunner.job_type) \
+                          .filter_by(hostname=hostname) \
+                          .order_by(Job.latest_heartbeat.desc()) \
+                          .limit(1) \
+                          .first()
+                      if (triggerer_job is not None) and triggerer_job.is_alive():
+                          pass
+                      else:
+                          sys.exit(f"The TriggererJob (id={triggerer_job.id}) for hostname '{hostname}' is not alive")
+          volumeMounts:            
+            - name: logs-data
+              mountPath: /opt/airflow/logs
+      volumes:        
+        - name: logs-data
+          emptyDir: {}
+---
+# Source: airflow/templates/webserver/webserver-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-web
+  labels:
+    app: airflow
+    component: web
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      ## multiple web pods can safely run concurrently
+      maxSurge: 25%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: airflow
+      component: web
+      release: airflow
+  template:
+    metadata:
+      annotations:
+        checksum/secret-config-envs: 4804aefbb403fe7afd8eb8154a2bff7edeb2700f48d7dc3d8f3d4a65dde8c737
+        checksum/secret-local-settings: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        checksum/config-webserver-config: 9738da91e0615e22362250a9f8410a2bba41f3dc2f6f3dc39b508bd194a1fb72
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      labels:
+        app: airflow
+        component: web
+        release: airflow
+    spec:
+      restartPolicy: Always
+      nodeSelector:
+        {}
+      affinity:
+        {}
+      tolerations:
+        []
+      serviceAccountName: airflow
+      securityContext:
+        fsGroup: 0
+      initContainers:        
+        - name: check-db  
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          envFrom:    
+            - secretRef:
+                name: airflow-config-envs
+          env:    
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:    
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "bash"
+            - "-c"
+            - "exec timeout 60s airflow db check"
+          volumeMounts:    
+            - name: logs-data
+              mountPath: /opt/airflow/logs        
+        - name: wait-for-db-migrations  
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          envFrom:    
+            - secretRef:
+                name: airflow-config-envs
+          env:    
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:    
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "bash"
+            - "-c"
+            - "exec airflow db check-migrations -t 60"
+          volumeMounts:    
+            - name: logs-data
+              mountPath: /opt/airflow/logs
+      containers:
+        - name: airflow-web          
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          resources:
+            {}
+          ports:
+            - name: web
+              containerPort: 8080
+              protocol: TCP
+          envFrom:            
+            - secretRef:
+                name: airflow-config-envs
+          env:            
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:            
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "bash"
+            - "-c"
+            - "exec airflow webserver"
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+            httpGet:
+              scheme: HTTP
+              path: /health
+              port: web
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+            httpGet:
+              scheme: HTTP
+              path: /health
+              port: web
+          volumeMounts:            
+            - name: logs-data
+              mountPath: /opt/airflow/logs
+            - name: webserver-config
+              mountPath: /opt/airflow/webserver_config.py
+              subPath: webserver_config.py
+              readOnly: true
+      volumes:        
+        - name: logs-data
+          emptyDir: {}
+        - name: webserver-config
+          secret:
+            secretName: airflow-webserver-config
+            defaultMode: 0644
+---
+# Source: airflow/charts/postgresql/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: airflow-postgresql
+  labels:
+    app: postgresql
+    chart: postgresql-8.6.4
+    release: "airflow"
+    heritage: "Helm"
+spec:
+  serviceName: airflow-postgresql-headless
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: postgresql
+      release: "airflow"
+      role: master
+  template:
+    metadata:
+      name: airflow-postgresql
+      labels:
+        app: postgresql
+        chart: postgresql-8.6.4
+        release: "airflow"
+        heritage: "Helm"
+        role: master
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    spec:      
+      securityContext:
+        fsGroup: 1001
+      initContainers:
+        # - name: do-something
+        #   image: busybox
+        #   command: ['do', 'something']
+        
+      containers:
+        - name: airflow-postgresql
+          image: ghcr.io/airflow-helm/postgresql-bitnami:11.16-patch.0
+          imagePullPolicy: "IfNotPresent"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          securityContext:
+            runAsUser: 1001
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: POSTGRESQL_PORT_NUMBER
+              value: "5432"
+            - name: POSTGRESQL_VOLUME_DIR
+              value: "/bitnami/postgresql"
+            - name: PGDATA
+              value: "/bitnami/postgresql/data"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: POSTGRES_DB
+              value: "airflow"
+            - name: POSTGRESQL_ENABLE_LDAP
+              value: "no"
+          ports:
+            - name: tcp-postgresql
+              containerPort: 5432
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U "postgres" -d "airflow" -h 127.0.0.1 -p 5432
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - -e
+                - |
+                  exec pg_isready -U "postgres" -d "airflow" -h 127.0.0.1 -p 5432
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
+            - name: data
+              mountPath: /bitnami/postgresql
+              subPath: 
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "1Gi"
+        storageClassName: directpv-min-io

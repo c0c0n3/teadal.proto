@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-web
+  labels:
+    app: airflow
+    component: web
+    chart: airflow-8.7.1
+    release: airflow
+    heritage: Helm
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      ## multiple web pods can safely run concurrently
+      maxSurge: 25%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: airflow
+      component: web
+      release: airflow
+  template:
+    metadata:
+      annotations:
+        checksum/secret-config-envs: 4804aefbb403fe7afd8eb8154a2bff7edeb2700f48d7dc3d8f3d4a65dde8c737
+        checksum/secret-local-settings: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        checksum/config-webserver-config: 9738da91e0615e22362250a9f8410a2bba41f3dc2f6f3dc39b508bd194a1fb72
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      labels:
+        app: airflow
+        component: web
+        release: airflow
+    spec:
+      restartPolicy: Always
+      serviceAccountName: airflow
+      securityContext:
+        fsGroup: 0
+      containers:
+        - name: airflow-web
+          image: apache/airflow:2.5.3-python3.8
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 50000
+            runAsGroup: 0
+          resources:
+            {}
+          ports:
+            - name: web
+              containerPort: 8080
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: airflow-config-envs
+          env:
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-postgresql
+                  key: postgresql-password
+            - name: CONNECTION_CHECK_MAX_COUNT
+              value: "0"
+          command:
+            - "/usr/bin/dumb-init"
+            - "--"
+            - "/entrypoint"
+          args:
+            - "bash"
+            - "-c"
+            - "exec airflow webserver"
+          # livenessProbe:
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 10
+          #   timeoutSeconds: 5
+          #   failureThreshold: 6
+          #   httpGet:
+          #     scheme: HTTP
+          #     path: /health
+          #     port: web
+          # readinessProbe:
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 10
+          #   timeoutSeconds: 5
+          #   failureThreshold: 6
+          #   httpGet:
+          #     scheme: HTTP
+          #     path: /health
+          #     port: web
+          volumeMounts:
+            - name: logs-data
+              mountPath: /opt/airflow/logs
+            - name: webserver-config
+              mountPath: /opt/airflow/webserver_config.py
+              subPath: webserver_config.py
+              readOnly: true
+      volumes:
+        - name: logs-data
+          emptyDir: {}
+        - name: webserver-config
+          secret:
+            secretName: airflow-webserver-config
+            defaultMode: 0644
