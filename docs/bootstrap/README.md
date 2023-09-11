@@ -40,3 +40,4 @@ your local dev env][dev-env].
 [dev-env]: ../dev-env.md
 [k8s-baseline]: ./k8s-baseline.md
 [mesh]: ./mesh.md
+[multipass]: ./multipass.md
