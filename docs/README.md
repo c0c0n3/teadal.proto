@@ -9,11 +9,9 @@ Here's some initial dev notes to explain part of what's been done.
   doesn't mess up your box.
 - [Cloud rollout][bootstrap]. Assembling a fully-fledged K8s `1.27.1`
   cluster and then doing the initial deployment of our cloud stack—Istio
-  & add-ons, Argo CD, etc. This initial deployment sets up the Istio
-  mesh and the Argo CD pipeline to deploy and manage the Teadal cloud
-  services and supporting K8s resources. We use GitOps at the OS-level
-  too, managing nodes remotely through config files in a Git repo. Plus,
-  we can reproduce the **exact same stack** on dev boxes to keep "works
+  & add-ons, Argo CD, etc. We use GitOps at the OS-level too, managing
+  nodes remotely through config files in a Git repo. Plus, we can
+  reproduce the **exact same stack** on dev boxes to keep "works
   on my machine" accidents from happening.
 - [Cluster admin access][admin-access]. Setting up admin access to
   your freshly minted K8s cluster.
