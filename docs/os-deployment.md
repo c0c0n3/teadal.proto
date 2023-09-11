@@ -90,6 +90,7 @@ file. Sweet!
 While `nixos-rebuild` already goes a long way, there's other tools
 we could leverage to manage a cloud of NixOS machines:
 
+- [nixos-anywhere][nixos-anywhere]
 - [NixOps][nixops]
 - [Colmena][colmena]
 - [morph][morph]
@@ -106,3 +107,4 @@ manage, `nixos-rebuild` is probably the best option.
 [morph]: https://github.com/DBCDK/morph
 [nix-depl]: https://www.haskellforall.com/2023/01/announcing-nixos-rebuild-new-deployment.html
 [nixops]: https://github.com/NixOS/nixops
+[nixos-anywhere]: https://github.com/numtide/nixos-anywhere
