@@ -2,13 +2,36 @@ Teadal cloud whirlwind tour
 ---------------------------
 > Hang tight!
 
-Let's check out the goodies we've installed. The IP address we use
-in the URLs below is that of Andy's VM. Replace it with your own.
+Let's check out the goodies we've installed.
 
 
 ### Setting the stage
 
-Same as in Teadal cloud bootstrap.
+You should have your Teadal cluster up and running somewhere and a
+shell with a `KUBECONFIG` env var pointing to the admin creds for
+your cluster.
+
+The commands in the sections below assume you have
+
+* cloned our repo
+* started a Nix shell: `cd teadal.proto/nix && nix shell`
+
+Also if your cluster is in the dev VM rather than a proper cloud,
+well you should start the VM I guess? :-) E.g.
+
+```bash
+$ qemu-system-x86_64 \
+    -machine q35,vmport=off -smp 4 -m 8G \
+    -drive file=devm.img.raw,format=raw,if=virtio \
+    -nic user,model=virtio-net-pci,hostfwd=tcp::10022-:22,hostfwd=tcp::16443-:6443,hostfwd=tcp::80-:80,hostfwd=tcp::5432-:5432
+```
+
+Notice the port mappings in the above command. You might have to
+tweak something like e.g. map port `8080` to `80` depending on what
+perms you have on the host and whether some host services already
+use those ports. All the examples below are based on the dev VM started
+with those port mappings, e.g. `http://localhost/argocd`. Change
+IP/hostname/ports in the examples below according to your setup.
 
 
 ### Argo CD
@@ -18,7 +41,7 @@ what the GitOps pipeline has deployed. Istio routes HTTP traffic
 to port 80 and path `/argocd` to the Argo CD server inside the mesh.
 So the web app is available at
 
-- http://20.4.3.245/argocd/
+- http://localhost/argocd/
 
 Log in with the username and password you entered in the Argo CD K8s
 secret. K8s resources are grouped into apps and, in turn, apps into
@@ -52,7 +75,7 @@ navigate to the HttpBin workload and then generate some traffic by
 hitting the HttpBin GET endpoint many times in a row until you see
 the Kiali graph
 
-- http://20.4.3.245/httpbin/get
+- http://localhost/httpbin/get
 
 (This works because the GitOps pipeline defined an HTTP route through
 port `80` and path `/httpbin`.)
@@ -95,7 +118,7 @@ path `/minio`. So you should be able to hit the service from your box
 like this
 
 ```bash
-$ curl -v http://20.4.3.245/minio
+$ curl -v http://localhost/minio
 ```
 
 You should get a fat `403` response. Access is denied without valid
@@ -104,7 +127,7 @@ creds. How rude.
 
 ### Security
 
-Keycloak is at http://20.4.3.245/keycloak, courtesy of Istio routing.
+Keycloak is at http://localhost/keycloak, courtesy of Istio routing.
 Navigate to the admin console and log in with the username and password
 you set in the Keycloak K8s secret.
 
@@ -121,7 +144,7 @@ into the DB with `psql` from your local machine.
 
 ```
 $ nix-shell -p postgresql_15
-$ psql postgres://postgres:abc123@20.4.3.245
+$ psql postgres://postgres:abc123@localhost
 ```
 
 Replace `abc123` with the password you entered in the Postgres K8s
