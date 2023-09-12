@@ -8,7 +8,7 @@
   parted, tcpdump, ldns, nmap, ethtool, tree, bc, lsof, lesspipe,
   ripgrep, ripgrep-all, mkpasswd, unzip, zip, aria,
 
-  git, kubectl, istioctl, argocd, kustomize, kubernetes-helm,
+  git, kubectl, istioctl, argocd, kustomize, kubernetes-helm, open-policy-agent,
   qemu, nixos-rebuild,
 
   kubectl-directpv, kubectl-minio
@@ -44,12 +44,13 @@ rec {
   node = node-cli ++ node-cloud;
 
   # Tools for K8s stack dev & ops to be installed in dev shells.
-  dev = [             # version (pkgs = nixos-23.05)
-    git               # 2.40.1
-    kubectl           # 1.27.1
-    kustomize         # 5.0.3
-    kubernetes-helm   # 3.11.3
-    qemu              # 8.0.0
+  dev = [             # version
+    git               # 2.40.1   (pkgs = nixos-23.05)
+    kubectl           # 1.27.1   (pkgs = nixos-23.05)
+    kustomize         # 5.0.3    (pkgs = nixos-23.05)
+    kubernetes-helm   # 3.11.3   (pkgs = nixos-23.05)
+    open-policy-agent # 0.53.1   (pkgs = nixos-unstable on 01 Jul 2023)
+    qemu              # 8.0.0    (pkgs = nixos-23.05)
     nixos-rebuild
   ] ++ node-cloud;
 

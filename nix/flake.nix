@@ -23,6 +23,8 @@
         (final: prev: {
           argocd = nixpkgs-unstable.legacyPackages.${system}.argocd;
           istioctl = nixpkgs-unstable.legacyPackages.${system}.istioctl;
+          open-policy-agent =
+            nixpkgs-unstable.legacyPackages.${system}.open-policy-agent;
         })
       ];
     };
