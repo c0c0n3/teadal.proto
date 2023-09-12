@@ -1,5 +1,5 @@
-Teadal cloud bootstrap
-----------------------
+Teadal mesh bootstrap
+---------------------
 > First rollout!
 
 So we've got a K8s cluster and now we've got to roll out our own
@@ -8,9 +8,6 @@ bootstrap Argo CD which will complete the initial deployment with
 all the goodies we've got in our repo. Past this initial bootstrap
 phase, Argo CD will pick up any changes to our repo and deploy them
 to implement the newly declared cluster state.
-
-**Important**. If you're using the Multipass VM, skip the "Direct PV"
-and "Local storage instead of DirectPV" sections below.
 
 
 ### Setting the stage
@@ -25,56 +22,66 @@ The commands in the sections below assume you have
 * made `teadal.proto/deployment/` your current dir.
 
 
-### Direct PV
+### External network
 
-**TODO**: the steps below won't work w/ the latest DirectPV (4.0.6).
-They worked w/ version 3 but we can't use that version anymore. Put
-together new instructions when you get DirectPV to work w/ K8s 1.27.
+The mesh we're going to roll out needs to be connected to some ports
+on the external network. Clients on the external network hit port `80`
+to access HTTP services. The Istio gateway uses a K8s node port to
+accept incoming traffic on port `80` and route it to the destination
+service inside the mesh. The Istio gateway also has a `5432` node port
+to let external clients interact with the Postgres DB inside the mesh.
+Finally admins will want to SSH into cluster nodes so port `22` should
+be open too as well as port `6443` which is the K8s API endpoint admin
+tools like `kubectl` should connect to.
 
-Install K8s CRDs, perms, Direct PV controller, node drivers, etc.
+How you actually make these ports available to processes running
+outside the mesh really depends on your setup. In the most trivial
+case where your cluster is made up by a single node and that node
+is directly connected to the Internet, all you need to do is open
+those ports in the firewall, if you have a one, or do nothing if
+there's no firewall. In a public cloud scenario, e.g. AWS, you
+typically have an admin console that lets you easily make ports
+available to clients out in the interwebs.
+
+
+### K8s storage
+
+We'll start off with local storage for now since we've only got one
+node in the cluster. Later on, when we add more nodes, we'll switch
+over to distributed storage backed by local disks on each node. (We
+set up DirectPV for that, but we could also use Longhorn or something
+else.)
+
+We'll create 4 PVs of 5GB each. Ideally they should be backed by
+disk partitions, but we'll cheat a bit and create dirs straight into
+the `/mnt` directory. (For the record, here's the proper way of
+doing [this sort of thing][proper-ls].) Anyhoo, let's go on with
+creating the dirs. SSH into the target node, then
 
 ```bash
-$ kustomize build mesh-infra/storage/directpv | kubectl create -f -
+$ sudo mkdir -p /data/d{1..4}
+$ sudo chmod -R 777 /data
 ```
 
-Discover available drives we can have Direct PV manage. The example
-output below refers to the dev VM where we left two partitions empty
-for Direct PV to use.
+Now get back to your Teadal repo on your local machine and run
 
 ```bash
-$ kubectl directpv drives ls
- DRIVE      CAPACITY  ALLOCATED  FILESYSTEM  VOLUMES  NODE  ACCESS-TIER  STATUS
- /dev/sda2  9.3 GiB   -          -           -        devm  -            Available
- /dev/sda3  9.3 GiB   -          -           -        devm  -            Available
+$ kustomize build mesh-infra/storage/pv/local/devm/ | kubectl apply -f -
 ```
 
-Make Direct PV manage the drives listed as "Available" on each node.
+
+### K8s secrets
 
 ```bash
-$ kubectl directpv drives format --drives /dev/sda2,/dev/sda3 --nodes devm
-                        # ^ pass in --force if the drive is already formatted
+$ kubectl apply -f mesh-infra/argocd/namespace.yaml
 ```
 
-Check the status of the drives you formatted eventually transitions
-to "Ready"—it might take a few secs.
+Edit the K8s Secret templates in `mesh-infra/security/secrets` to
+enter the passwords you'd like to use. Then install them in the cluster
 
 ```bash
-$ kubectl directpv drives ls
- DRIVE      CAPACITY  ALLOCATED  FILESYSTEM  VOLUMES  NODE  ACCESS-TIER  STATUS
- /dev/sda2  4.7 GiB   -          xfs         -        devm  -            Ready
- /dev/sda3  4.7 GiB   -          xfs         -        devm  -            Ready
+$ kustomize build mesh-infra/security/secrets | kubectl apply -f -
 ```
-
-
-### Local storage instead of DirectPV
-
-TODO. have a look at the local-storage branch
-
-mkfs.ext4 -L directpv-1 /dev/sda2
-mkfs.ext4 -L directpv-2 /dev/sda3
-
-kubectl apply -f mesh-infra/storage/pv/devm.yaml
-kustomize build mesh-infra/storage/ | kubectl apply -f -
 
 
 ### Istio
@@ -129,16 +136,6 @@ Go for coffee.
   about it.
   > unable to recognize "STDIN": no matches for kind "AppProject" in version "argoproj.io/v1alpha1"
 
-
-### Secrets
-
-Edit the K8s Secret templates in `mesh-infra/security/secrets` to
-enter the passwords you'd like to use. Then install them in the cluster
-
-```bash
-$ kustomize build mesh-infra/security/secrets | kubectl apply -f -
-```
-
 Notice that Argo CD creates an initial secret with an admin user of
 `admin` and randomly generated password on the first deployment. To
 grab that password, run
@@ -156,3 +153,8 @@ CD with the password you entered in our secret. To do that, just
 ```bash
 $ kubectl -n argocd delete secret argocd-initial-admin-secret
 ```
+
+
+
+
+[proper-ls]: https://github.com/kubernetes-sigs/sig-storage-local-static-provisioner/blob/master/docs/operations.md

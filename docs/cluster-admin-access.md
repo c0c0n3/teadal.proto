@@ -1,4 +1,4 @@
-Cluster Admin Access
+Cluster admin access
 --------------------
 > Keep it safe!
 
@@ -21,22 +21,21 @@ your box to a cluster node, logging in as `admin`. Once you're in,
 have fun with `kubectl`.
 
 Here's an example where we use the dev VM. For the sake of argument,
-say you started the dev VM on MacOS (x86_64), forwarding local port
-`60022` to the VM port `22` (SSH)
+say you started the dev VM forwarding local port `10022` to the VM
+port `22` (SSH)
 
 ```bash
 $ qemu-system-x86_64 \
-    -machine q35,vmport=off -cpu host -smp 2 -m 4G -accel hvf \
-    -display none \
-    -nic user,hostfwd=tcp::10022-:22 \
-    devm.img.qcow2
+    -machine q35,vmport=off -smp 4 -m 8G \
+    -drive file=devm.img.raw,format=raw,if=virtio \
+    -nic user,model=virtio-net-pci,hostfwd=tcp::10022-:22
 ```
 
 Now log in through SSH and run any `kubectl` command you fancy
 
 ```bash
 $ ssh admin@localhost -p 10022
-[admin@devm:~]$ kubectl get pod --all-namespaces
+[admin@devm:~]$ kubectl get pod -A
 ```
 
 
@@ -53,14 +52,13 @@ config to connect to the cluster. Let's see how to do that with
 the dev VM—for a remote cluster you'd do pretty much the same.
 
 Start the dev VM forwarding both SSH and K8s ports. Here's how to
-do that on MacOS (x86_64)
+do that
 
 ```bash
 $ qemu-system-x86_64 \
-    -machine q35,vmport=off -cpu host -smp 2 -m 4G -accel hvf \
-    -display none \
-    -nic user,hostfwd=tcp::10022-:22,hostfwd=tcp::16443-:6443 \
-    devm.img.qcow2
+    -machine q35,vmport=off -smp 4 -m 8G \
+    -drive file=devm.img.raw,format=raw,if=virtio \
+    -nic user,model=virtio-net-pci,hostfwd=tcp::10022-:22,hostfwd=tcp::16443-:6443
 ```
 
 Notice your local port `16443` gets forwarded to `6443` which is
@@ -79,6 +77,7 @@ Then copy over the referenced key files to your local `k8s` dir,
 keeping the same file names. e.g.
 
 ```bash
+$ cd k8s
 $ scp -P 10022 admin@localhost:/var/lib/kubernetes/secrets/ca.pem ./
 $ scp -P 10022 admin@localhost:/var/lib/kubernetes/secrets/cluster-admin.pem ./
 $ scp -P 10022 admin@localhost:/var/lib/kubernetes/secrets/cluster-admin-key.pem ./

@@ -7,8 +7,8 @@ spin up a VM to run the Teadal cloud. Not as flexible, reproducible,
 etc. as Nix/NixOS but it should be compatible.
 
 In fact, the Teadal cloud stack should work on any decently set up
-K8s `1.25` cluster base. So what we're going to do here is spin up
-a Multipass VM and install K8s `1.25` in it.
+K8s `1.27` cluster base. So what we're going to do here is spin up
+a Multipass VM and install K8s `1.27` in it.
 
 
 ### Create the Multipass VM

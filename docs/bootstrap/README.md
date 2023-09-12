@@ -1,43 +1,43 @@
-Cluster bootstrap
------------------
-> ...or the Teadal big-bang event.
+Teadal cloud rollout
+--------------------
+> From zero to hero!
 
-We need to put together a K8s baseline installation we can later
-use to host our cloud stack—Istio & add-ons, Argo CD, etc. The
-outcome should be a fully-fledged, K8s `1.27.1` cluster. Also,
-each node should have an OS base we can fully manage remotely through
-config files in a Git repo. Plus, we should be able to reproduce
-the **exact same stack** on dev boxes to keep "works on my machine"
-accidents from happening.
+How do you build the Teadal cloud from scratch? We've got a sort
+of streamlined procedure you can follow. It shouldn't be too hard,
+but surely there's still plenty of room for improvement.
 
-There's more than one way to skin a cat. To get the ball rolling we
-decided to use [Nix & friends][nix]. Nix has [huge advantages][nix-explore]
-over other tech stacks you could use to do GitOps as well as building
-& managing a K8s cluster. But Nix isn't everyone's cup of tea. So it
-goes without saying that we can ditch it going forward if the team
-doesn't like it and use something else instead-surely there's plenty
-to choose from, e.g. Terraform, Ansible, etc.
+In a nutshell, you've got to
 
-Anyhoo, here's what our procedures to bootstrap dev & cluster nodes
-look like at the moment.
+1. [Set up a baseline K8s cluster][k8s-baseline]. Install a K8s baseline
+   we can later use to host our cloud stack—Istio & add-ons, Argo CD, etc.
+   The outcome should be a fully-fledged, K8s `1.27.1` cluster. We do this
+   with NixOS so we can fully manage nodes remotely through config files
+   in a Git repo. Plus, we can reproduce the **exact same stack** on dev
+   boxes as well, to keep "works on my machine" accidents from happening.
+2. [Configure cluster admin access][admin-access]. Set up admin access
+   to your freshly minted K8s cluster.
+3. [Bootstrap the Teadal mesh][mesh]. Set up the Istio mesh and the
+   Argo CD pipelines to deploy and manage the Teadal cloud services
+   and supporting K8s resources.
 
-- [Bootstrapping a dev node][vm]. Read this to build a fully-fledged,
-  one-node K8s cluster from scratch in under 20 mins.
-- [Bootstrapping a cluster node][node]. How you'd set up a K8s node
-  in an actual multi-node cluster.
+Notice that (3) doesn't really depend on any of the NixOS stuff we
+roll out in (1). If for some reason you don't want to use NixOS and
+you can provide your own fully-fledged K8s `1.27.1` cluster, then skip
+(1) and (2) and jump right into (3). In fact, you could, for example,
+set up a MicroK8s cluster in a way similar to what's explained here
 
-Keep in mind we could streamline these procedures even more if we
-built custom NixOS images-see [#3][gh#3]. In that case, you'd be
-able to bootstrap a fully-fledged node in three simple steps: boot
-the image, partition the storage, run `nixos-install`. If we go down
-that road, then we can also build AWS, GCE, etc. images basically at
-no additional dev cost.
+- [Multipass VM][multipass]. Alternative VM setup with no NixOS in
+  sight. You can also use this as a dev env or as a baseline to
+  install MicroK8s on Ubuntu.
 
-
+Either way, before going ahead, make sure you've [set up properly
+your local dev env][dev-env].
 
 
-[gh#3]: https://github.com/c0c0n3/teadal.proto/issues/3
-[nix]: https://nixos.org/
-[nix-explore]: https://nixos.org/explore.html
-[node]: ./node.md
-[vm]: ./vm.md
+
+
+[admin-access]: ../cluster-admin-access.md
+[dev-env]: ../dev-env.md
+[k8s-baseline]: ./k8s-baseline.md
+[mesh]: ./mesh.md
+[multipass]: ./multipass.md
