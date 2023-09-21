@@ -3,15 +3,14 @@
   buildGoModule                                               # NOTE (3)
 }:
 let
-  gitTag = "v0.53.1-envoy";                                   # NOTE (1)
-  pkgVer = "0.53.1-envoy";
+  cfg = import ./config.nix;                                  # NOTE (1)
 in buildGoModule rec {
-  pname = "opa-envoy-plugin";
-  version = pkgVer;
+  pname = cfg.pname;
+  version = cfg.pkgVer;
   src = fetchFromGitHub {
     owner = "open-policy-agent";
     repo = "opa-envoy-plugin";
-    rev = gitTag;
+    rev = cfg.gitTag;
     sha256 = "sha256-ng5hPk2R59OrB6PovhtbrPx+/dOFG4uiexQdPxyZfls=";
   };
   vendorSha256 = null;
@@ -20,7 +19,7 @@ in buildGoModule rec {
   CGO_ENABLED = 0;                                            # NOTE (2)
   WASM_ENABLED = 0;
   ldflags = [
-    "-X github.com/open-policy-agent/opa/version.Version=${gitTag}"
+    "-X github.com/open-policy-agent/opa/version.Version=${cfg.gitTag}"
   ];
 
   postConfigure = ''
