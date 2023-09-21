@@ -14,6 +14,7 @@ the Teadal cluster. Names & versions below.
 * kustomize `5.0.3`
 * kubernetes-helm `3.11.3`
 * opa `0.53.1`
+* opa-envoy-plugin `0.53.1`
 * qemu `8.0.0`
 
 Please, like please, install the exact versions and if you do have
