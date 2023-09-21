@@ -40,14 +40,26 @@ with types;
         sha256 = "sha256-yXkgJW2SQcAFzjmBSAn2qo6O4m5AgMKwiT/LR+dqmzA=";
       };
     };
+    teadal.k8s.aarch64.opaEnvoyPluginImg = mkOption {
+      description = ''
+        Aarch64 OPA Envoy Plugin Docker image. OPA don't release an Aarch64
+        image, so we preload our own custom-built one.
+      '';
+      type = package;
+      default = pkgs.teadal.opa-envoy-plugin-img;
+    };
   };
 
   config = let
     enabled = pkgs.stdenv.isAarch64 && config.teadal.k8s.aarch64.enable;
     corednsImg = config.teadal.k8s.aarch64.corednsImg;
+    opanvoyImg = config.teadal.k8s.aarch64.opaEnvoyPluginImg;
   in (mkIf enabled
   {
-    services.kubernetes.addons.dns.coredns = corednsImg;
+    services.kubernetes = {
+      addons.dns.coredns = corednsImg;
+      kubelet.seedDockerImages = [ opanvoyImg ];
+    };
 
     services.etcd.extraConf = {
       # etcd won't start on aarch64 unless ETCD_UNSUPPORTED_ARCH is

@@ -6,7 +6,7 @@
 let
   cfg = import ./config.nix;
 in dockerTools.buildImage {
-  name = cfg.pname;
+  name = cfg.imgName;
   tag = cfg.pkgVer;
 
   copyToRoot = buildEnv {
