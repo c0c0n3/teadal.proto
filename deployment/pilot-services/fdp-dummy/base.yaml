@@ -70,7 +70,7 @@ spec:
       containers:
         - name: fdp-dummy
           image: polimiis/teadal-base-fdp-sync
-          env:
+          env: #  Not ideal to hardcode the minio credentials, but we can't mount secrets from a different namespace so ...
           - name: MINIO_ENDPOINT
             value: "http://teadal-hl.minio-operator.svc.cluster.local:9000"
           - name: MINIO_ACCESS_KEY
