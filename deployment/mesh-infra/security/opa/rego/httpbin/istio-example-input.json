@@ -1,0 +1,60 @@
+{
+    "input": {
+        "attributes": {
+            "destination": {
+                "address": {
+                    "socketAddress": {
+                        "address": "10.1.0.215",
+                        "portValue": 8080
+                    }
+                }
+            },
+            "metadataContext": {},
+            "request": {
+                "http": {
+                    "headers": {
+                        ":authority": "localhost",
+                        ":method": "GET",
+                        ":path": "/httpbin/get",
+                        ":scheme": "http",
+                        "accept": "*/*",
+                        "user-agent": "curl/7.88.1",
+                        "x-envoy-decorator-operation": "httpbin.default.svc.cluster.local:8000/httpbin/*",
+                        "x-envoy-internal": "true",
+                        "x-envoy-peer-metadata": "ChQKDkFQUF9DT05UQUlORVJTEgIaAAoaCgpDTFVTVEVSX0lEEgwaCkt1YmVybmV0ZXMKHAoMSU5TVEFOQ0VfSVBTEgwaCjEwLjEuMC4yMTUKGQoNSVNUSU9fVkVSU0lPThIIGgYxLjE4LjAKnAMKBkxBQkVMUxKRAyqOAwodCgNhcHASFhoUaXN0aW8taW5ncmVzc2dhdGV3YXkKEwoFY2hhcnQSChoIZ2F0ZXdheXMKFAoIaGVyaXRhZ2USCBoGVGlsbGVyCjYKKWluc3RhbGwub3BlcmF0b3IuaXN0aW8uaW8vb3duaW5nLXJlc291cmNlEgkaB3Vua25vd24KGQoFaXN0aW8SEBoOaW5ncmVzc2dhdGV3YXkKGQoMaXN0aW8uaW8vcmV2EgkaB2RlZmF1bHQKMAobb3BlcmF0b3IuaXN0aW8uaW8vY29tcG9uZW50EhEaD0luZ3Jlc3NHYXRld2F5cwoSCgdyZWxlYXNlEgcaBWlzdGlvCjkKH3NlcnZpY2UuaXN0aW8uaW8vY2Fub25pY2FsLW5hbWUSFhoUaXN0aW8taW5ncmVzc2dhdGV3YXkKLwojc2VydmljZS5pc3Rpby5pby9jYW5vbmljYWwtcmV2aXNpb24SCBoGbGF0ZXN0CiIKF3NpZGVjYXIuaXN0aW8uaW8vaW5qZWN0EgcaBWZhbHNlChoKB01FU0hfSUQSDxoNY2x1c3Rlci5sb2NhbAovCgROQU1FEicaJWlzdGlvLWluZ3Jlc3NnYXRld2F5LTU2NDQ0Njg3NzQtYzJuaGwKGwoJTkFNRVNQQUNFEg4aDGlzdGlvLXN5c3RlbQpdCgVPV05FUhJUGlJrdWJlcm5ldGVzOi8vYXBpcy9hcHBzL3YxL25hbWVzcGFjZXMvaXN0aW8tc3lzdGVtL2RlcGxveW1lbnRzL2lzdGlvLWluZ3Jlc3NnYXRld2F5ChcKEVBMQVRGT1JNX01FVEFEQVRBEgIqAAonCg1XT1JLTE9BRF9OQU1FEhYaFGlzdGlvLWluZ3Jlc3NnYXRld2F5",
+                        "x-envoy-peer-metadata-id": "router~10.1.0.215~istio-ingressgateway-5644468774-c2nhl.istio-system~istio-system.svc.cluster.local",
+                        "x-forwarded-for": "10.1.0.1",
+                        "x-forwarded-proto": "http",
+                        "x-request-id": "35c68889-aef3-94a5-8e49-ea9e226ad77c"
+                    },
+                    "host": "localhost",
+                    "id": "2059982201333860156",
+                    "method": "GET",
+                    "path": "/httpbin/get",
+                    "protocol": "HTTP/1.1",
+                    "scheme": "http"
+                },
+                "time": "2023-09-22T16:57:58.257964Z"
+            },
+            "source": {
+                "address": {
+                    "socketAddress": {
+                        "address": "10.1.0.1",
+                        "portValue": 50108
+                    }
+                }
+            }
+        },
+        "parsed_body": null,
+        "parsed_path": [
+            "httpbin",
+            "get"
+        ],
+        "parsed_query": {},
+        "truncated_body": false,
+        "version": {
+            "encoding": "protojson",
+            "ext_authz": "v3"
+        }
+    }
+}

@@ -1,0 +1,34 @@
+#
+# Secure access to the cluster by delegating authz decisions to our
+# OPA instance.
+#
+# Notice this rule applies to all traffic through port 80 of the Istio
+# ingress gateway, except for some paths. We could be more specific if
+# need be---e.g. have separate rules for different services, ports, etc.
+# instead of this catch-all rule at the ingress gateway level.
+#
+# See also:
+# - https://istio.io/latest/docs/tasks/security/authorization/authz-custom/
+#
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: opa-ingress
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      istio: ingressgateway
+  action: CUSTOM
+  provider:
+    name: "opa.default"
+  rules:
+  - to:
+    - operation:
+        # Ask OPA for permission to go ahead w/ any incoming request except
+        # for requests to Keycloak and Argo CD.
+        notPaths:
+        - "/argocd"
+        - "/argocd/*"
+        - "/keycloak"
+        - "/keycloak/*"

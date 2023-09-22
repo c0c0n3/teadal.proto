@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ingress-policy.yaml
+- opa-envoy-plugin.yaml
+
+secretGenerator:
+- name: opa-policy
+  files:
+  - rego/main.rego
+  - httpbin.service.rego=rego/httpbin/service.rego
+  - minio.service.rego=rego/minio/service.rego
