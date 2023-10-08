@@ -1,23 +1,18 @@
 #
-# TODO docs
+# Functionality to verify JWT tokens and extract their payload.
+# Verification doesn't require any key sharing and/or config as, for
+# each token, we automatically discover, download and cache token
+# issuer's JWKs.
+# Most likely the only function you need from this package is `claims`.
 #
 
 package authnz.oidc
 
 
 # Verify the JWT token and extract its payload. Expect the token to be
-# in the "Authorization" header as a "Bearer" token. Check all of the
-# statements below are true:
-#
-# * the algo in the header is the same that was used to sign the token;
-# * the token signature is valid;
-# * there's an `exp` field in the payload holding a valid date `d`;
-# * `d` is in the future.
-#
-# Plus, if there's an `nbf` field in the payload, check it has a valid
-# date in the past.
-#
-# Automatically download issuer keys and cache them for a day.
+# in the "Authorization" header as a "Bearer" token.
+# Automatically download issuer keys and cache them for a day. Then
+# use them to verify the token as explained in `token_payload`.
 # If `jwks_preferred_urls` has a key equal to the token issuer's base
 # URL (scheme and authority, e.g. http://my.host), use the correspondig
 # URL value to download the JWKS object. For instance, if
@@ -46,38 +41,58 @@ claims(request, jwks_preferred_urls) := payload {
     payload := token_payload(token, jwks)
 }
 
-# Verify the JWT token and extract its payload. Check all of the
-# statements below are true:
+# Verify a JWT token and extract its payload. (At the moment we can only
+# verify RSA or ECDSA-signed tokens---algos: RS256, RS384, RS512, ES256,
+# ES384, ES512, PS256, PS384 and PS512.)
+# Check all of the statements below are true:
 #
-# * the algo in the header is the same that was used to sign the token;
-# * the token signature is valid;
-# * there's an `exp` field in the payload holding a valid date `d`;
-# * `d` is in the future.
+# * the header contains a public key ID `k` and `k` is also the ID of
+#   one of the keys in the token issuer's JWKs;
+# * `k`'s corresponding private key was used to sign the token and the
+# * token signature is valid;
+# * there's an `exp` field in the payload holding a valid date `d` and
+#   `d` is in the future;
+# * if there's an `nbf` field in the payload, it has a valid date in
+#   the past.
 #
-# Plus, if there's an `nbf` field in the payload, check it has a valid
-# date in the past.
+# Notice the first three checks are critical to stop attacks exploiting
+# algo header field vulnerabilities:
+# - https://www.chosenplaintext.ca/2015/03/31/jwt-algorithm-confusion.html
 #
 # Params
 # - token. The JWT token to verify and extract the payload from.
 # - jwks. The key set containing the key the issuer makes available to
-#   verify the token signature. This is a JWKS JSON object typically
-#   retrieved from a URL discovered through the issuer's well-known
-#   OIDC config endpoint.
+#   verify the token signature. Notice this is a Rego object holding the JWKS
+#   JSON data, typically retrieved from a URL discovered through the issuer's
+#   well-known OIDC config endpoint.
 token_payload(token, jwks) := payload {
-    [h, _, _] := io.jwt.decode(token)
+    # Call `decode_verify` to extract token data and verify its signature.
+    # Convert the Rego `jwks` object back to a JSON string. (Weirdly enough,
+    # `decode_verify` won't work with the Rego object.)
+    # Notice `cert` supports RS256, RS384, RS512, ES256, ES384, ES512, PS256,
+    # PS384 and PS512 but not HS256, HS384, and HS512 for which you'd have
+    # to use the `secret` field instead.
     [valid, header, payload] := io.jwt.decode_verify(token, {
-        "alg": h.alg,
-        "cert": jwks
+        "cert": json.marshal(jwks)
     })
 
     # Assert `valid` is `true`.
     valid
+
+    # Make sure the header contains a key ID and there exist a key in
+    # `jwks` with the same ID. If this is true, then we can be sure the
+    # Rego implementation has picked that key for verification:
+    # - https://github.com/open-policy-agent/opa/blob/v0.53.1/topdown/tokens.go#L348
+    # - https://github.com/open-policy-agent/opa/blob/v0.53.1/topdown/tokens.go#L382
+    jwks.keys[_].kid = header.kid
 
     # Assert there's an `exp` field in the payload.
     # If true, then `decode_verify` must've checked `exp`'s value is a date
     # in the future. We need this since if `exp` isn't there, `decode_verify`
     # sets `valid` to `true`.
     payload.exp
+
+    # `decode_verify` checks `nbf` is in the past, if present.
 }
 
 # Extract the Bearer token from the HTTP request if present, otherwise
@@ -137,9 +152,18 @@ preferred_token_jwks_url(token_payload, url_lookup) := url {
 
 # Use `token_payload.iss` as a base URL to build the well-known OIDC
 # config URL.
-token_issuer_config_url(token_payload) := url {
+token_issuer_config_url(token_payload) = url {
+    not endswith(token_payload.iss, "/")
     config_path := ".well-known/openid-configuration"
     url := concat("/", [token_payload.iss, config_path])
+}
+
+# Use `token_payload.iss` as a base URL to build the well-known OIDC
+# config URL.
+token_issuer_config_url(token_payload) = url {
+    endswith(token_payload.iss, "/")
+    config_path := ".well-known/openid-configuration"
+    url := concat("", [token_payload.iss, config_path])
 }
 
 # Fetch the token issuer's absolute URL where the issuer makes token

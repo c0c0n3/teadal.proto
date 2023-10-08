@@ -53,8 +53,6 @@ test_token_issuer_config_url_2 {
     token_payload := {"iss": "https://key.cloak/realms/master/"}
     got := token_issuer_config_url(token_payload)
     got == want
-    # TODO fix double slash
-    # got: https://key.cloak/realms/master//.well-known/openid-configuration
 }
 
 # NOTE. This test needs the Teadal VM running on localhost.
@@ -75,4 +73,44 @@ test_token_jwks_canonical_url {
     jwks.keys  # assert present
 }
 
-# TODO test token_payload and claims functions
+test_extract_bearer_token {
+    dummy_jwt := "header.payload.signature"
+    request := {
+        "headers": {
+            "authorization": make_bearer_auth(dummy_jwt)
+        }
+    }
+    bearer_token(request) == dummy_jwt
+}
+
+test_extract_token_payload_with_valid_jwt {
+    payload := {
+        "sub": "vans",
+        "nbf": 3600,        # 1hr since the epoc
+        "exp": 10000000000  # 20 Nov 2286 @ 18:46:40 (CET)
+    }
+    token := generate_tasty_token(payload)
+    payload == token_payload(token, jwks_tasty_config)
+}
+
+test_extract_token_payload_with_expired_jwt {
+    payload := {
+        "sub": "vans",
+        "nbf": 3600,        # 1hr since the epoc
+        "exp": 3600         # 1hr since the epoc
+    }
+    token := generate_tasty_token(payload)
+    not token_payload(token, jwks_tasty_config)
+}
+
+test_extract_token_payload_with_nbf_in_the_future {
+    payload := {
+        "sub": "vans",
+        "nbf": 10000000000, # 20 Nov 2286 @ 18:46:40 (CET)
+        "exp": 10000000000  # 20 Nov 2286 @ 18:46:40 (CET)
+    }
+    token := generate_tasty_token(payload)
+    not token_payload(token, jwks_tasty_config)
+}
+
+# TODO test claims functions
