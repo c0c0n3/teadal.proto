@@ -9,4 +9,4 @@ jwks_preferred_urls := {
     "https://localhost": internal_keycloak_jwks_url
 }
 
-jwt_user_field_name := "sub"
+jwt_user_field_name := "email"

@@ -38,6 +38,6 @@ role_to_perms := {
 
 # Map each user to their roles.
 user_to_roles := {
-    "jeejee": [ product_owner, product_consumer ],
-    "sebs": [ product_consumer ]
+    "jeejee@teadal.eu": [ product_owner, product_consumer ],
+    "sebs@teadal.eu": [ product_consumer ]
 }
