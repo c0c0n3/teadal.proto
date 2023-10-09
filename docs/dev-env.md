@@ -5,7 +5,9 @@ Dev env
 At the moment, we're using some basic tools to develop and manage
 the Teadal cluster. Names & versions below.
 
+* curl `8.1.1`
 * git `2.40.1`
+* jq `1.6`
 * kubectl `1.27.1`
 * kubectl-directpv `4.0.6`
 * kubectl-minio `5.0.6`

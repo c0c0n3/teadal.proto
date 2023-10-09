@@ -9,7 +9,7 @@
   ripgrep, ripgrep-all, mkpasswd, unzip, zip, aria,
 
   git, kubectl, istioctl, argocd, kustomize, kubernetes-helm, open-policy-agent,
-  qemu, nixos-rebuild,
+  qemu, nixos-rebuild, curl, jq,
 
   kubectl-directpv, kubectl-minio,
   opa-envoy-plugin
@@ -46,7 +46,9 @@ rec {
 
   # Tools for K8s stack dev & ops to be installed in dev shells.
   dev = [             # version
+    curl              # 8.1.1    (pkgs = nixos-23.05)
     git               # 2.40.1   (pkgs = nixos-23.05)
+    jq                # 1.6      (pkgs = nixos-23.05)
     kubectl           # 1.27.1   (pkgs = nixos-23.05)
     kustomize         # 5.0.3    (pkgs = nixos-23.05)
     kubernetes-helm   # 3.11.3   (pkgs = nixos-23.05)
