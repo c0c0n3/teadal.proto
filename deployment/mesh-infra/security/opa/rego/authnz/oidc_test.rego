@@ -114,4 +114,41 @@ test_extract_token_payload_with_nbf_in_the_future {
     not token_payload(token, jwks_tasty_config)
 }
 
-# TODO test claims functions
+test_claims_with_static_jwks {
+    config := {
+        "jwks": jwks_tasty_config
+    }
+    payload := {
+        "iss": "me",
+        "exp": 10000000000  # 20 Nov 2286 @ 18:46:40 (CET)
+    }
+    token := generate_tasty_token(payload)
+    request := {
+        "headers": {
+            "authorization": make_bearer_auth(token)
+        }
+    }
+    payload == claims(request, config)
+}
+
+test_claims_with_dynamic_jwks {
+    config := {
+        "jwks_preferred_urls": {
+            "http://mock": "http://mock/jwks"
+        }
+    }
+    payload := {
+        "iss": "http://mock",
+        "exp": 10000000000  # 20 Nov 2286 @ 18:46:40 (CET)
+    }
+    token := generate_tasty_token(payload)
+    request := {
+        "headers": {
+            "authorization": make_bearer_auth(token)
+        }
+    }
+    extracted_payload := claims(request, config)
+                         with data.authnz.oidc.fetch_token_jwks as jwks_tasty_config
+
+    payload == extracted_payload
+}
