@@ -21,12 +21,10 @@ role_perms(rbac_db, role) := perms {
 }
 
 # Find all the permissions associated the the given user.
-# TODO. broken at the mo. See test_user_perms:
-#   eval_conflict_error:
-#     functions must not produce multiple outputs for same inputs
 user_perms(rbac_db, user) := perms {
-    role := user_roles(rbac_db, user)[_]
-    perms := role_perms(rbac_db, role)[_]
+    roles := user_roles(rbac_db, user)
+    perm_sets := { rbac_db.role_to_perms[k] | roles[k] }
+    perms := union(perm_sets)
 }
 
 # Check the given user is allowed to carry out the requested operation
