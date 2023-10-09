@@ -36,6 +36,7 @@ spec:
         image: quay.io/keycloak/keycloak:21.1.2
         args:
         - start
+        - --import-realm
         env:
         # Use HTTP (we'll switch to HTTPs later on for pilot deployments)
         # and build URLs of depending on host and port found in the request.
@@ -75,7 +76,13 @@ spec:
         volumeMounts:
         - name: h2-volume
           mountPath: /opt/keycloak/data/h2/
+        - name: teadal-realm-bootstrap
+          mountPath: /opt/keycloak/data/import/teadal-bootstrap.json
+          subPath: teadal-bootstrap.json
       volumes:
       - name: h2-volume
         persistentVolumeClaim:
           claimName: keycloak-pvc
+      - name: teadal-realm-bootstrap
+        configMap:
+          name: teadal-realm-bootstrap
