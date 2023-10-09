@@ -13,7 +13,7 @@ product_consumer := "product_consumer"
 
 # Map each role to a set of permission objects.
 # Each permission object specifies a set of allowed HTTP methods for
-# the Web resources identitified by the URLs matching the given regex.
+# the Web resources identified by the URLs matching the given regex.
 role_to_perms := {
     product_owner: {
         {
