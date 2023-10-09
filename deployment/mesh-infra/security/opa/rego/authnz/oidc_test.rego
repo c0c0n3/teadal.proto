@@ -55,21 +55,22 @@ test_token_issuer_config_url_2 {
     got == want
 }
 
-# NOTE. This test needs the Teadal VM running on localhost.
 test_token_jwks_preferred_url {
     token_payload := {"iss": "http://localhost/keycloak/realms/master"}
     url_lookup := {
         "http://localhost": "http://localhost/keycloak/realms/master/protocol/openid-connect/certs"
     }
     jwks := token_jwks(token_payload, url_lookup)
+            with data.authnz.oidc.fetch_token_jwks as jwks_tasty_config
     jwks.keys  # assert present
 }
 
-# NOTE. This test needs the Teadal VM running on localhost.
 test_token_jwks_canonical_url {
     token_payload := {"iss": "http://localhost/keycloak/realms/master"}
     url_lookup := { }
     jwks := token_jwks(token_payload, url_lookup)
+            with data.authnz.oidc.fetch_token_issuer_jwks_url as "mock"
+            with data.authnz.oidc.fetch_token_jwks as jwks_tasty_config
     jwks.keys  # assert present
 }
 
