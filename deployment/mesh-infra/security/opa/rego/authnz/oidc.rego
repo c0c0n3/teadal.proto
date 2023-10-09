@@ -1,43 +1,39 @@
 #
 # Functionality to verify JWT tokens and extract their payload.
+# Most likely the only function you'll ever need out of the ones
+# below is `claims`.
+#
 # Verification doesn't require any key sharing and/or config as, for
 # each token, we automatically discover, download and cache token
-# issuer's JWKs.
-# Most likely the only function you need from this package is `claims`.
+# issuer's JWKs. But you can override this behaviour by providing a
+# config object with your own JWKs as explained in the config test.
 #
 
 package authnz.oidc
 
 
 # Verify the JWT token and extract its payload. Expect the token to be
-# in the "Authorization" header as a "Bearer" token.
-# Automatically download issuer keys and cache them for a day. Then
-# use them to verify the token as explained in `token_payload`.
-# If `jwks_preferred_urls` has a key equal to the token issuer's base
-# URL (scheme and authority, e.g. http://my.host), use the correspondig
-# URL value to download the JWKS object. For instance, if
-#   jwt.payload.iss = https://keycloak.external/realms/master
-#   jwks_preferred_urls["https://keycloak.external"] =
-#       http://kc.internal/realms/master/protocol/openid-connect/certs
-# then use this ^ URL to download the JWKS.
-# Otherwise, use the issuer's OIDC well-known config to find out where
-# to download the JWKS from.
-# Notice the `jwks_preferred_urls` can be useful if you want to test
-# with `localhost` or if you want to call your own issuer using an
-# internal cluster address.
+# in the "Authorization" header as a "Bearer" token. Depending on config,
+# either automatically download issuer keys and cache them for a day or
+# use statically configured JWKs. Then use them to verify the token as
+# explained in `token_payload`.
 #
 # Params
 # - request. An object containing the HTTP request headers in an object
 #   map called `headers`. Typically, when using the OPA Envoy plugin, you'd
 #   pass in `input.attributes.request.http` for the request param.
-# - jwks_preferred_urls. An map (object) where each key is an issuer URL
-#   and the key's corresponding value is the absolute URL where the issuer
-#   makes the JWKS object available for download. The key URL must contain
-#   only the scheme and authority---e.g. http://my.host, http://my.host:8080.
-claims(request, jwks_preferred_urls) := payload {
+# - config. An object containing `authnz` config---see the config test
+#   for explanations.
+claims(request, config) := payload {
+    config.jwks
+    token := bearer_token(request)
+    payload := token_payload(token, config.jwks)
+}
+claims(request, config) := payload {
+    not config.jwks
     token := bearer_token(request)
     [_, p, _] := io.jwt.decode(token)
-    jwks := token_jwks(p, jwks_preferred_urls)
+    jwks := token_jwks(p, config.jwks_preferred_urls)
     payload := token_payload(token, jwks)
 }
 
@@ -62,7 +58,7 @@ claims(request, jwks_preferred_urls) := payload {
 # Params
 # - token. The JWT token to verify and extract the payload from.
 # - jwks. The key set containing the key the issuer makes available to
-#   verify the token signature. Notice this is a Rego object holding the JWKS
+#   verify the token signature. Notice this is a Rego object holding the JWKs
 #   JSON data, typically retrieved from a URL discovered through the issuer's
 #   well-known OIDC config endpoint.
 token_payload(token, jwks) := payload {
