@@ -5,7 +5,7 @@
 package config.oidc
 
 
-internal_keycloak_jwks_url := "http://keycloak:8080/keycloak/realms/master/protocol/openid-connect/certs"
+internal_keycloak_jwks_url := "http://keycloak:8080/keycloak/realms/teadal/protocol/openid-connect/certs"
 
 jwks_preferred_urls := {
     "http://localhost": internal_keycloak_jwks_url,
