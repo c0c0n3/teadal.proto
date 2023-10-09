@@ -1,6 +1,9 @@
+#
+# Base `authnz` config.
+# See `authnz.config` for explanations.
+#
 package config.oidc
 
-# TODO explain this!
 
 internal_keycloak_jwks_url := "http://keycloak:8080/keycloak/realms/master/protocol/openid-connect/certs"
 
