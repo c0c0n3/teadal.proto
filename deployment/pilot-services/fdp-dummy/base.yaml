@@ -7,8 +7,8 @@ metadata:
 spec:
   ports:
   - name: http
-    port: 80
-    targetPort: 80
+    port: 8080
+    targetPort: 8080
   selector:
     app: fdp-dummy
 
@@ -48,7 +48,7 @@ spec:
           - name: data
             mountPath: /tmp/patients.json
             subPath: patients.json
-        command: ["sh", "-c", "mc alias set rawdata http://teadal-hl.minio-operator.svc.cluster.local:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY && mc mb raw/teadal && mc --insecure cp /tmp/patients.json rawdata/teadal/patients.json"]
+        command: ["sh", "-c", "mc alias set rawdata http://teadal-teadal-0.teadal-hl.minio-operator.svc.cluster.local:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY && mc mb rawdata/teadal && mc --insecure cp /tmp/patients.json rawdata/teadal/patients.json"]
       restartPolicy: Never
 ---
 apiVersion: apps/v1
@@ -70,9 +70,13 @@ spec:
       containers:
         - name: fdp-dummy
           image: polimiis/teadal-base-fdp-sync
+          ports:
+          - containerPort: 8080
           env: #  Not ideal to hardcode the minio credentials, but we can't mount secrets from a different namespace so ...
-          - name: MINIO_ENDPOINT
-            value: "http://teadal-hl.minio-operator.svc.cluster.local:9000"
+          - name: MINIO_HOST
+            value: "teadal-teadal-0.teadal-hl.minio-operator.svc.cluster.local"
+          - name: MINIO_PORT
+            value: "9000"
           - name: MINIO_ACCESS_KEY
             value: LTXG5CVY0MXLE0WO75Q6
           - name: MINIO_SECRET_KEY
@@ -80,19 +84,19 @@ spec:
           resources:
             limits:
               cpu: 100m
-              memory: 128Mi  
+              memory: 128Mi
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: "http-virtual-service"
+  name: "fdp-virtual-service"
 spec:
   gateways:
   - "teadal-gateway"
   hosts:
   - "*"
   http:
-  - match: 
+  - match:
     - uri:
         prefix: /fdp/
     - uri:
@@ -103,7 +107,7 @@ spec:
     - destination:
         host: fdp-dummy.default.svc.cluster.local
         port:
-          number: 80
+          number: 8080
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -111,7 +115,7 @@ metadata:
   name: dummydata
   namespace: minio-operator
 data:
-  patients.json: |- 
+  patients.json: |-
    [{
     "id" : "d290f1ee-6c54-4b01-90e6-d701748f0851",
     "first_name" : "Marshall",
