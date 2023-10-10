@@ -10,11 +10,18 @@
 #
 package teadal
 
+import data.fdpdummy.service as fdpdummy
 import data.httpbin.service as httpbin
 import data.minio.service as minio
 
 
 default allow := false
+
+allow {
+    fdpdummy.allow
+}
+
+# or
 
 allow {
     httpbin.allow
