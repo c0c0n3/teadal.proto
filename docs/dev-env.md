@@ -5,7 +5,9 @@ Dev env
 At the moment, we're using some basic tools to develop and manage
 the Teadal cluster. Names & versions below.
 
+* curl `8.1.1`
 * git `2.40.1`
+* jq `1.6`
 * kubectl `1.27.1`
 * kubectl-directpv `4.0.6`
 * kubectl-minio `5.0.6`
@@ -13,6 +15,8 @@ the Teadal cluster. Names & versions below.
 * argocd `2.7.6`
 * kustomize `5.0.3`
 * kubernetes-helm `3.11.3`
+* opa `0.53.1`
+* opa-envoy-plugin `0.53.1`
 * qemu `8.0.0`
 
 Please, like please, install the exact versions and if you do have

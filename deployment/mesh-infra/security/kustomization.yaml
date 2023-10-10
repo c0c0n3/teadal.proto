@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
 - keycloak/
+- opa/
 - reloader/
 
 # NOTE

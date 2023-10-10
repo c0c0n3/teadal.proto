@@ -3,3 +3,8 @@ kind: Kustomization
 
 resources:
 - base.yaml
+
+configMapGenerator:
+- name: teadal-realm-bootstrap
+  files:
+  - teadal-bootstrap.json

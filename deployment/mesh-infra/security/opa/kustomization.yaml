@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ingress-policy.yaml
+- opa-envoy-plugin.yaml
+
+secretGenerator:
+- name: opa-policy
+  files:
+  - rego/main.rego
+  - authnz.envopa.rego=rego/authnz/envopa.rego
+  - authnz.http.rego=rego/authnz/http.rego
+  - authnz.oidc.rego=rego/authnz/oidc.rego
+  - authnz.rbac.rego=rego/authnz/rbac.rego
+  - config.oidc.rego=rego/config/oidc.rego
+  - httpbin.service.rego=rego/httpbin/service.rego
+  - httpbin.rbacdb.rego=rego/httpbin/rbacdb.rego
+  - minio.service.rego=rego/minio/service.rego

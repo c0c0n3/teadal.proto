@@ -27,14 +27,21 @@ let
   # If you'd rather build from source, use this expression instead:
   # kubectl-minio = sysPkgs.callPackage ./kubectl-minio/pkg.nix { };
 
+  opa-envoy-plugin = sysPkgs.callPackage ./opa-envoy-plugin/pkg.nix { };
+  opa-envoy-plugin-img = sysPkgs.callPackage ./opa-envoy-plugin/docker.nix {
+    inherit opa-envoy-plugin;
+  };
+
   tools = sysPkgs.callPackage ./cli-tools/pkg.nix {
-    inherit kubectl-directpv kubectl-minio;
+    inherit kubectl-directpv kubectl-minio opa-envoy-plugin;
   };
 
 in rec {
   packages.${system} =
     tools.shared // (if isLinux then tools.linux else {}) //
-    { inherit kubectl-directpv kubectl-minio; };
+    { inherit kubectl-directpv kubectl-minio
+              opa-envoy-plugin opa-envoy-plugin-img;
+    };
   defaultPackage.${system} = tools.shared.cli-tools-dev-shell;
 }
 # NOTE
