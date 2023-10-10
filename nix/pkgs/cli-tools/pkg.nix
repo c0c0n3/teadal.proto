@@ -11,7 +11,7 @@
   git, kubectl, istioctl, argocd, kustomize, kubernetes-helm, open-policy-agent,
   qemu, nixos-rebuild, curl, jq,
 
-  kubectl-directpv, kubectl-minio,
+  kubectl-directpv, kubectl-minio, minio-client,
   opa-envoy-plugin
 }:
 
@@ -52,6 +52,7 @@ rec {
     kubectl           # 1.27.1   (pkgs = nixos-23.05)
     kustomize         # 5.0.3    (pkgs = nixos-23.05)
     kubernetes-helm   # 3.11.3   (pkgs = nixos-23.05)
+    minio-client      # RELEASE.2023-05-04T18-10-16Z (pkgs = nixos-23.05)
     open-policy-agent # 0.53.1   (pkgs = nixos-unstable on 01 Jul 2023)
     opa-envoy-plugin  # 0.53.1   (pkgs = nixos-23.05)
     qemu              # 8.0.0    (pkgs = nixos-23.05)
