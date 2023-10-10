@@ -1,0 +1,153 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: fdp-dummy
+  name: fdp-dummy
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  selector:
+    app: fdp-dummy
+
+---
+# inject data to minio -- instead you should already have your data or create a data store for you synthetic data or start a process to generate the data into the data store of your choice
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: add-files-to-minio
+  namespace: minio-operator
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      volumes:
+      - name: data
+        configMap:
+          name: dummydata
+          items:
+            - key: patients.json
+              path: patients.json
+      containers:
+      - name: mc
+        image: minio/mc:RELEASE.2023-06-23T18-12-07Z
+        env:
+          - name: MINIO_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: teadal-user-1
+                key: CONSOLE_ACCESS_KEY
+          - name: MINIO_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: teadal-user-1
+                key: CONSOLE_SECRET_KEY
+        volumeMounts:
+          - name: data
+            mountPath: /tmp/patients.json
+            subPath: patients.json
+        command: ["sh", "-c", "mc alias set rawdata http://teadal-hl.minio-operator.svc.cluster.local:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY && mc mb raw/teadal && mc --insecure cp /tmp/patients.json rawdata/teadal/patients.json"]
+      restartPolicy: Never
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: fdp-dummy
+  name: fdp-dummy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fdp-dummy
+  template:
+    metadata:
+      labels:
+        app: fdp-dummy
+    spec:
+      containers:
+        - name: fdp-dummy
+          image: polimiis/teadal-base-fdp-sync
+          env: #  Not ideal to hardcode the minio credentials, but we can't mount secrets from a different namespace so ...
+          - name: MINIO_ENDPOINT
+            value: "http://teadal-hl.minio-operator.svc.cluster.local:9000"
+          - name: MINIO_ACCESS_KEY
+            value: LTXG5CVY0MXLE0WO75Q6
+          - name: MINIO_SECRET_KEY
+            value: IKxps9GTiPGBZaK6BRmeF434lGZCNx0XG3sa4PLE
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi  
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: "http-virtual-service"
+spec:
+  gateways:
+  - "teadal-gateway"
+  hosts:
+  - "*"
+  http:
+  - match: 
+    - uri:
+        prefix: /fdp/
+    - uri:
+        prefix: /fdp
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: fdp-dummy.default.svc.cluster.local
+        port:
+          number: 80
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dummydata
+  namespace: minio-operator
+data:
+  patients.json: |- 
+   [{
+    "id" : "d290f1ee-6c54-4b01-90e6-d701748f0851",
+    "first_name" : "Marshall",
+    "middle_name" : "Nelson",
+    "last_name" : "Cena",
+    "email" : "marshallcena@gmail.com",
+    "phone_number" : 0,
+    "age" : 18,
+    "gender" : "Male",
+    "emergency_number" : 0,
+    "address" : "1600 Pennsylvania Avenue NW, Washington DC",
+    "pathology" : "Covid-19"
+    },
+    {
+      "id" : "d290f1ee-6c54-4b01-90e6-d701748f0852",
+      "first_name" : "Pippo",
+      "middle_name" : "Pippo",
+      "last_name" : "Pippo",
+      "email" : "pippopippo@gmail.com",
+      "phone_number" : 0,
+      "age" : 25,
+      "gender" : "Male",
+      "emergency_number" : 0,
+      "address" : "1600 Pennsylvania Avenue NW, Washington DC",
+      "pathology" : "Covid-19"
+    },
+    {
+      "id" : "d290f1ee-6c54-4b01-90e6-d701748f0853",
+      "first_name" : "Pluto",
+      "middle_name" : "Pluto",
+      "last_name" : "Pluto",
+      "email" : "plutopluto@gmail.com",
+      "phone_number" : 0,
+      "age" : 65,
+      "gender" : "Female",
+      "emergency_number" : 0,
+      "address" : "1600 Pennsylvania Avenue NW, Washington DC",
+      "pathology" : "Stroke"
+    }]
