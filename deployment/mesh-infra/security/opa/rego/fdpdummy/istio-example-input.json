@@ -1,0 +1,81 @@
+{
+    "decision_id": "feb7b595-4933-4502-a5c3-804808b2a6c1",
+    "input": {
+      "attributes": {
+        "destination": {
+          "address": {
+            "socketAddress": {
+              "address": "10.1.0.177",
+              "portValue": 8080
+            }
+          }
+        },
+        "metadataContext": {},
+        "request": {
+          "http": {
+            "headers": {
+              ":authority": "localhost",
+              ":method": "GET",
+              ":path": "/fdp/patients/age",
+              ":scheme": "http",
+              "accept": "*/*",
+              "authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIzWl9GaXBpVWhQRkRTZU5lYkJQekJsWEFPWVpCYlo2aGZZejR4RUxEU1BJIn0.eyJleHAiOjE2OTY5MzQ0OTgsImlhdCI6MTY5NjkzNDE5OCwianRpIjoiNzg1MTE1NTQtNWNmMS00NTdmLTkwMjktMjc1OGI4Y2I4NzRjIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdC9rZXljbG9hay9yZWFsbXMvdGVhZGFsIiwic3ViIjoiODNjZDdlNzYtMzM0YS00MDEwLWJjODItZDNjOTM3MTNiYjFjIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYWRtaW4tY2xpIiwic2Vzc2lvbl9zdGF0ZSI6ImJjYWVjYjhkLTAwYjItNDY5ZC05MDJhLTUyZmJkNGZlYjE3OSIsImFjciI6IjEiLCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiJiY2FlY2I4ZC0wMGIyLTQ2OWQtOTAyYS01MmZiZDRmZWIxNzkiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VicyIsImdpdmVuX25hbWUiOiIiLCJmYW1pbHlfbmFtZSI6IiIsImVtYWlsIjoic2Vic0B0ZWFkYWwuZXUifQ.eEdnyyApzk_SeOx8BuPpkPuamYPaz-cSaPjrio1OAcB0XTiksENQpyVa__PmfR5p9Wx0zXonV1XOttxwW3d_z7B1tmaCIIKsD0cpmuN9RrWzJNWtzfX4HJblD1JD2_K5oeDXFP90YLT_wCksEuZ9EvpspqNqYE_j1NgbbnOkeijFkknKW62AmL3NP6lOdK3xLW3ywnw0iidlZ6_0ob1LrnWEwpQ-5zGfJWeerZVejkq6wiqR3AWW7KizNkEDALCMxhI79oRYqKBcHJp0wfwz9MrNvfOACuuUs06AB3qgJiraPRZUnuNVCuZjUmzy_I9JB_PjOx0niA2ZKVLhwnSJCg",
+              "user-agent": "curl/8.1.1",
+              "x-envoy-decorator-operation": "fdp-dummy.default.svc.cluster.local:8080/fdp/*",
+              "x-envoy-internal": "true",
+              "x-envoy-peer-metadata": "ChQKDkFQUF9DT05UQUlORVJTEgIaAAoaCgpDTFVTVEVSX0lEEgwaCkt1YmVybmV0ZXMKHAoMSU5TVEFOQ0VfSVBTEgwaCjEwLjEuMC4xNzcKGQoNSVNUSU9fVkVSU0lPThIIGgYxLjE4LjAKnAMKBkxBQkVMUxKRAyqOAwodCgNhcHASFhoUaXN0aW8taW5ncmVzc2dhdGV3YXkKEwoFY2hhcnQSChoIZ2F0ZXdheXMKFAoIaGVyaXRhZ2USCBoGVGlsbGVyCjYKKWluc3RhbGwub3BlcmF0b3IuaXN0aW8uaW8vb3duaW5nLXJlc291cmNlEgkaB3Vua25vd24KGQoFaXN0aW8SEBoOaW5ncmVzc2dhdGV3YXkKGQoMaXN0aW8uaW8vcmV2EgkaB2RlZmF1bHQKMAobb3BlcmF0b3IuaXN0aW8uaW8vY29tcG9uZW50EhEaD0luZ3Jlc3NHYXRld2F5cwoSCgdyZWxlYXNlEgcaBWlzdGlvCjkKH3NlcnZpY2UuaXN0aW8uaW8vY2Fub25pY2FsLW5hbWUSFhoUaXN0aW8taW5ncmVzc2dhdGV3YXkKLwojc2VydmljZS5pc3Rpby5pby9jYW5vbmljYWwtcmV2aXNpb24SCBoGbGF0ZXN0CiIKF3NpZGVjYXIuaXN0aW8uaW8vaW5qZWN0EgcaBWZhbHNlChoKB01FU0hfSUQSDxoNY2x1c3Rlci5sb2NhbAovCgROQU1FEicaJWlzdGlvLWluZ3Jlc3NnYXRld2F5LTU2NDQ0Njg3NzQtbWhta2QKGwoJTkFNRVNQQUNFEg4aDGlzdGlvLXN5c3RlbQpdCgVPV05FUhJUGlJrdWJlcm5ldGVzOi8vYXBpcy9hcHBzL3YxL25hbWVzcGFjZXMvaXN0aW8tc3lzdGVtL2RlcGxveW1lbnRzL2lzdGlvLWluZ3Jlc3NnYXRld2F5ChcKEVBMQVRGT1JNX01FVEFEQVRBEgIqAAonCg1XT1JLTE9BRF9OQU1FEhYaFGlzdGlvLWluZ3Jlc3NnYXRld2F5",
+              "x-envoy-peer-metadata-id": "router~10.1.0.177~istio-ingressgateway-5644468774-mhmkd.istio-system~istio-system.svc.cluster.local",
+              "x-forwarded-for": "10.1.0.1",
+              "x-forwarded-proto": "http",
+              "x-request-id": "4df3d53e-e821-9785-95e8-36800b1528c8"
+            },
+            "host": "localhost",
+            "id": "15580023311131230002",
+            "method": "GET",
+            "path": "/fdp/patients/age",
+            "protocol": "HTTP/1.1",
+            "scheme": "http"
+          },
+          "time": "2023-10-10T10:27:42.927091Z"
+        },
+        "source": {
+          "address": {
+            "socketAddress": {
+              "address": "10.1.0.1",
+              "portValue": 34093
+            }
+          }
+        }
+      },
+      "parsed_body": null,
+      "parsed_path": [
+        "fdp",
+        "patients",
+        "age"
+      ],
+      "parsed_query": {},
+      "truncated_body": false,
+      "version": {
+        "encoding": "protojson",
+        "ext_authz": "v3"
+      }
+    },
+    "labels": {
+      "id": "861b0992-fbd5-459c-b5d5-6a88413608d3",
+      "version": "v0.53.1-envoy"
+    },
+    "level": "info",
+    "metrics": {
+      "counter_rego_builtin_http_send_interquery_cache_hits": 1,
+      "timer_rego_builtin_http_send_ns": 188751,
+      "timer_rego_external_resolve_ns": 666,
+      "timer_rego_query_eval_ns": 1428756,
+      "timer_server_handler_ns": 2364344
+    },
+    "msg": "Decision Log",
+    "query": "data.teadal.allow",
+    "result": false,
+    "time": "2023-10-10T10:27:42Z",
+    "timestamp": "2023-10-10T10:27:42.93295159Z",
+    "type": "openpolicyagent.org/decision_logs"
+  }
