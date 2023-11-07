@@ -26,9 +26,11 @@ spec:
   - to:
     - operation:
         # Ask OPA for permission to go ahead w/ any incoming request except
-        # for requests to Keycloak and Argo CD.
+        # for requests to Keycloak, Argo CD or Postgres.
         notPaths:
         - "/argocd"
         - "/argocd/*"
         - "/keycloak"
         - "/keycloak/*"
+        notPorts:
+        - "5432"
