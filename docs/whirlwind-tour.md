@@ -72,10 +72,10 @@ $ istioctl d kiali
 ```
 
 navigate to the HttpBin workload and then generate some traffic by
-hitting the HttpBin GET endpoint many times in a row until you see
-the Kiali graph
+hitting the HttpBin SVG image endpoint many times in a row until
+you see the Kiali graph
 
-- http://localhost/httpbin/get
+- http://localhost/httpbin/image/svg
 
 (This works because the GitOps pipeline defined an HTTP route through
 port `80` and path `/httpbin`.)
