@@ -4,6 +4,9 @@ Teadal cloud proto
 
 Here's some initial dev notes to explain part of what's been done.
 
+
+### DevOps
+
 - [Dev env][dev-env]. Setting up basic tools to develop and manage
   the Teadal cluster. One-liner install with a virtual env that
   doesn't mess up your box.
@@ -15,8 +18,6 @@ Here's some initial dev notes to explain part of what's been done.
   on my machine" accidents from happening.
 - [Cluster admin access][admin-access]. Setting up admin access to
   your freshly minted K8s cluster.
-- [Whirlwind tour][demo]. Checking out all the goodies packed in the
-  Teadal cloud. Not to be missed!
 - [Qemu snippets][qemu]. Providing little tips and snippets to use
   Qemu to simulate cloud nodes.
 - [OS deployment][os-depl]. Doing GitOps at the OS-level. Keep the
@@ -24,6 +25,18 @@ Here's some initial dev notes to explain part of what's been done.
   to a remote set of machines to update their configuration, packages,
   services, etc. The git repo is the single source of truth, the remote
   machines reflect the deployment state declared in the repo.
+
+
+### Features
+
+- [Whirlwind tour][demo]. Checking out all the goodies packed in the
+  Teadal cloud. Not to be missed!
+
+
+### Architecture
+
+- [Security][sec]. Design and implementation of the security architecture,
+  with a focus on securing data products.
 
 
 
@@ -34,3 +47,4 @@ Here's some initial dev notes to explain part of what's been done.
 [dev-env]: ./dev-env.md
 [os-depl]: ./os-deployment.md
 [qemu]: ./qemu.md
+[sec]: ./sec-design/README.md
