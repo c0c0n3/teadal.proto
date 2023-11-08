@@ -18,3 +18,7 @@ allow = true {
     # Put below this line any service-specific checks on e.g. http_request
 
 }
+
+allow = true {
+    regex.match("^/httpbin/image.*", http_request.path)
+}

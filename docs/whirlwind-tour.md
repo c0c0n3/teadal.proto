@@ -72,10 +72,10 @@ $ istioctl d kiali
 ```
 
 navigate to the HttpBin workload and then generate some traffic by
-hitting the HttpBin GET endpoint many times in a row until you see
-the Kiali graph
+hitting the HttpBin SVG image endpoint many times in a row until
+you see the Kiali graph
 
-- http://localhost/httpbin/get
+- http://localhost/httpbin/image/svg
 
 (This works because the GitOps pipeline defined an HTTP route through
 port `80` and path `/httpbin`.)
@@ -135,6 +135,101 @@ Speaking of secrets, we've got Reloader to watch for secret changes
 and bounce affected pods. So secrets always stay fresh. Have a look
 at the K8s logs to see what's going on under the bonnet.
 
+After logging onto Keycloak you should check there's a Teadal realm
+with two users, `jeejee@teadal.eu` and `sebs@teadal.eu`, both having
+log-in enabled and a password of `abc123`. The GitOps pipeline creates
+and pre-populates the Teadal realm automatically.
+
+Now you should check out how we secure data products. Our setup ain't
+exactly straightforward, so to make sense of the examples below you
+should probably first read about [our security architecture][sec],
+at least the conceptual model section.
+
+We'll use HttbBin to simulate a data product. There's a [policy][httpbin-rbac]
+that defines two roles:
+- *Product owner*. The owner may do any kind of HTTP request to URLs
+   starting with `/httpbin/anything/`.
+- *Product consumer*. On the other hand, the consumer is only allowed
+  to read (`GET`) URLs starting with `/httpbin/anything/` or the (exact)
+  URL `/httpbin/get`.
+
+`jeejee@teadal.eu` is both a product owner and consumer, whereas
+`sebs@teadal.eu` is just a consumer. To interact with HttpBin, both
+users need to get a JWT from Keycloak and attach it to service requests
+since the policy doesn't allow anonymous requests to the above URLs.
+In fact, if you try e.g.
+
+```bash
+$ curl -i -X GET localhost/httpbin/anything/do
+$ curl -i -X GET localhost/httpbin/get
+```
+
+you should get back a fat `403` in both cases. So let's get a JWT
+for `jeejee@teadal.eu`. We'll store it in a env var so we can use
+it later. The command below should do the trick. (If you've changed
+the user's password in Keycloak, replace `abc123` with the new one.)
+
+```bash
+$ export jeejees_token=$(\
+    curl -s \
+      http://localhost/keycloak/realms/teadal/protocol/openid-connect/token \
+      -d 'grant_type=password' -d 'client_id=admin-cli' \
+      -d 'username=jeejee@teadal.eu' -d 'password=abc123' | jq -r '.access_token')
+```
+
+And, as we're at it, let's get a JWT for `sebs@teadal.eu` too.
+
+```bash
+$ export sebs_token=$(\
+    curl -s \
+      http://localhost/keycloak/realms/teadal/protocol/openid-connect/token \
+      -d 'grant_type=password' -d 'client_id=admin-cli' \
+      -d 'username=sebs@teadal.eu' -d 'password=abc123' | jq -r '.access_token')
+```
+
+Again, if you've changed `sebs@teadal.eu`'s password, update the
+command above accordingly. Also keep in mind these tokens are quite
+short-lived (about 4 mins) so if you take too long to go through the
+examples below, you'll have to get fresh tokens again.
+
+Both product owner and consumer are allowed to read a URL path like
+`/httpbin/anything/do`. So both users, `jeejee@teadal.eu` (owner)
+and `sebs@teadal.eu` (consumer), should be able to do a GET and get
+back (pun intended) a `200`, provided we attach their respective JWT
+to the each request:
+
+```bash
+$ curl -i -X GET localhost/httpbin/anything/do \
+       -H "Authorization: Bearer ${jeejees_token}"
+$ curl -i -X GET localhost/httpbin/anything/do \
+       -H "Authorization: Bearer ${sebs_token}"
+```
+
+But, as a product owner, `jeejee@teadal.eu` should be able to do
+anything he fancies to the above path, like `DELETE`, whereas
+`sebs@teadal.eu`, as a consumer, should not.
+
+```bash
+$ curl -i -X DELETE localhost/httpbin/anything/do \
+       -H "Authorization: Bearer ${jeejees_token}"
+$ curl -i -X DELETE localhost/httpbin/anything/do \
+       -H "Authorization: Bearer ${sebs_token}"
+```
+
+You should see a `200` response for the first request, but a `403`
+for the second. Finally, since both users are product consumers,
+they should both allowed to `GET /httpbin/get`
+
+```bash
+$ curl -i -X GET localhost/httpbin/get \
+       -H "Authorization: Bearer ${jeejees_token}"
+$ curl -i -X GET localhost/httpbin/get \
+       -H "Authorization: Bearer ${sebs_token}"
+```
+
+You should see a `200` response in both cases. That just about wraps
+it up for the security show.
+
 
 ### DBs
 
@@ -149,3 +244,9 @@ $ psql postgres://postgres:abc123@localhost
 
 Replace `abc123` with the password you entered in the Postgres K8s
 secret.
+
+
+
+
+[httpbin-rbac]: ../deployment/mesh-infra/security/opa/rego/httpbin/rbacdb.rego
+[sec]: ./sec-design/README.md
