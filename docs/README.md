@@ -49,5 +49,5 @@ Here's some initial dev notes to explain part of what's been done.
 [dev-env]: ./dev-env.md
 [os-depl]: ./os-deployment.md
 [qemu]: ./qemu.md
-[runtime]: ./arch/runtime.md
+[runtime]: ./arch/runtime/README.md
 [sec]: ./sec-design/README.md

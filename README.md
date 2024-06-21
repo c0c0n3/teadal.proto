@@ -13,5 +13,5 @@ diagram.
 
 
 [docs]: ./docs/README.md
-[docs.runtime]: ./docs/arch/runtime.md
+[docs.runtime]: ./docs/arch/runtime/README.md
 [dia.tech-stack]: ./docs/tech-stack.svg
