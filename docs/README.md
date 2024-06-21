@@ -35,6 +35,8 @@ Here's some initial dev notes to explain part of what's been done.
 
 ### Architecture
 
+- [Cluster runtime][runtime]. Runtime composition and deployment of
+  the hardware and software to run an instance of a Teadal data lake.
 - [Security][sec]. Design and implementation of the security architecture,
   with a focus on securing data products.
 
@@ -47,4 +49,5 @@ Here's some initial dev notes to explain part of what's been done.
 [dev-env]: ./dev-env.md
 [os-depl]: ./os-deployment.md
 [qemu]: ./qemu.md
+[runtime]: ./arch/runtime.md
 [sec]: ./sec-design/README.md
