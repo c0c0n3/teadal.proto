@@ -50,4 +50,4 @@ Here's some initial dev notes to explain part of what's been done.
 [os-depl]: ./os-deployment.md
 [qemu]: ./qemu.md
 [runtime]: ./arch/runtime/README.md
-[sec]: ./sec-design/README.md
+[sec]: ./arch/sec-design/README.md
