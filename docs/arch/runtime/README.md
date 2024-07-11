@@ -81,9 +81,16 @@ examples of Teadal services and tools in the core services layer.
 
 Finally, *products* is the top layer, hosting cluster-specific data
 products and services—i.e., federated data products (FDPs), shared
-federated data products (SFDP), etc. The diagram below summarises
-the discussion so far by presenting the cluster runtime arranged
-in the four layers just defined.
+federated data products (SFDP), etc. As detailed in D3.1 [**TODO**:
+cite], a federated data product (FDP) extends the notion of data mesh
+product to cater for sharing data in a data lake federation according
+to the governance rules of that federation. A shared federated data
+product (SFDP) encapsulates a consumer-producer agreement (contract)
+about sharing a part of an FDP and provides the means for the consumer
+to process the shared data only within the bounds of the agreed-upon
+contract. The diagram below summarises the discussion so far by
+presenting the cluster runtime arranged in the four layers just
+defined.
 
 ![Cluster runtime stack.][dia.tech-stack]
 
@@ -140,8 +147,14 @@ updated through a GitOps approach whereby the desired cluster runtime
 is declared in an online Git repository and a dedicated GitOps cluster
 service, Argo CD, reconciles the desired runtime with the actual cluster
 state. Thus, for each Teadal cluster `C[k]` deployed as part of a Teadal
-pilot rollout there is a corresponding Git repository `R[k]` and ArgoCD
+pilot rollout there is a corresponding Git repository `R[k]` and Argo CD
 service `A[k]` running in `C[k]` that reconciles `R[k]` with `C[k]`.
+For example, the cluster for the viticulture pilot is deployed from
+the *Smart Viticulture Teadal.Node* repository (https://gitlab.teadal.ubiwhere.com/teadal-pilots/viticulture-pilot/smart-viticulture-teadal-node)
+and runs its own Argo CD service which monitors the *Smart Viticulture
+Teadal.Node* repository and, upon detecting a change in the repository,
+reconfigures the viticulture cluster to match the updated deployment
+declarations in the repository.
 
 Now, any two repositories `R[h]` and `R[k]` need to include the same
 baseline software stack `S`—service and data mesh, Teadal tools, etc.
@@ -152,10 +165,15 @@ repositories `R[h]` and `R[k]` will also be the same.
 
 For this reason, `S` is developed and managed in a master repository
 (`teadal.node`) and each `R[k]` is a fork of the master which contains
-data products and services specific to the pilot rollout. This arrangement
-avoids duplicating `S` in each `R[k]` and provides the means to easily
-propagate any change to `S` from the master repository to the forks
-`R[1]`, `R[2]`, etc., as illustrated in the diagram below.
+data products and services specific to the pilot rollout. Forking
+allows each `R[k]` to inherit the baseline components from `teadal.node`,
+while also enabling customisation for specific deployments. This
+arrangement avoids duplicating `S` in each `R[k]` and provides the
+means to easily propagate any change to `S` from the master repository
+to the forks `R[1]`, `R[2]`, etc., as illustrated in the diagram below.
+Thus, when a new feature or update is added to the master repository,
+it can be seamlessly integrated into all forks, ensuring consistency
+and reducing maintenance overhead.
 
 ![Teadal master and pilot rollout repositories.][dia.cluster-repos]
 
