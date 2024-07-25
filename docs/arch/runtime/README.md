@@ -12,9 +12,12 @@ and more concrete standpoint:
 - [Implementation][impl]. Complements the abstract description with
   the software products that have been selected implement the above
   spec and also details the actual deployment process.
+- [Integration][int]. Outlines how to integrate a cloud service into
+  a Teadal cluster.
 
 
 
 
 [spec]: ./spec.md
 [impl]: ./implementation.md
+[int]: ./integration.md
