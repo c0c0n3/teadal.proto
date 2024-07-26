@@ -216,7 +216,124 @@ external traffic to the service.
 
 ### Securing the service
 
+As explained in the [security architecture][sec], Teadal features
+service security with OPA policies. SFDPs need not implement any
+authentication and authorization code as Teadal carries out these
+security workflows at runtime through message interception. Istio
+captures any incoming HTTP request and delegates security decisions
+to OPA. OPA runs Teadal security framework code which verifies that
+the request originates from an authenticated user and grants access
+to the target SFDP only if there exist a policy which allows that
+user to perform the given request.
 
+Thus, the `robertson-farm` developer's task is to write a policy.
+Although Teadal does not mandate any specific authorisation scheme,
+it does offer a built-in Role-Based Access Control (RBAC) framework
+which is what the developer decides to leverage in order to simplify
+policy writing and reduce implementation effort. The developer would
+like to have two roles, product owner and consumer, and grant access
+to two SFDP resources:
+- `/config`: service configuration a product owner only should be
+   able to create, read, update and delete.
+- `/data`: service data both the product owner and consumer should
+   be able to read.
+
+Teadal users are managed through Keycloak. Two users registered in
+Keycloak should get access to the `robertson-farm` SFDP:
+`alice@robertson-farm.za` as a product owner and `bob@analytics.eu`
+as a product consumer.
+
+Policies are written in Rego. The Teadal RBAC frameworks makes it
+easy to translate RBAC specifications into Rego code. In fact, all
+the developer needs to do is declare the roles, map each role to
+permissions, and finally map each user to their respective roles
+as shown below.
+
+```rego
+# This code is in `robertson_farm/rbacdb.rego`.
+# The Rego package declaration should mach the filesystem path.
+package robertson_farm.rbacdb
+
+# Role defs.
+product_owner := "product_owner"
+product_consumer := "product_consumer"
+
+# Map each role to a list of permission objects.
+# Each permission object specifies a set of allowed HTTP methods for
+# the Web resources identified by the URLs matching the given regex.
+role_to_perms := {
+    product_owner: [
+        {
+            "methods": [ "GET", "PUT", "DELETE" ],
+            "url_regex": "^/config$"
+        }
+    ],
+    product_consumer: [
+        {
+            "methods": [ "GET" ],
+            "url_regex": "^/data$"
+        }
+    ]
+}
+
+# Map each user to their roles.
+user_to_roles := {
+    "alice@robertson-farm.za": [ product_owner, product_consumer ],
+    "bob@analytics.eu": [ product_consumer ]
+}
+```
+
+At the moment all the Rego code is hosted in the Teadal cluster
+repository itself inside the *mesh infrastructure* layer directory.
+(This will change soon as the next Teadal development iteration should
+implement OPA policy bundles.) Specifically, the path of the Rego
+code base relative to the *mesh infrastructure* layer directory is
+`security/opa/rego/`. Thus, the developer creates a directory to
+hold their Rego code, `security/opa/rego/robertson_farm`, and puts
+the above `rbacdb.rego` file in there as well as the `service.rego`
+file shown below.
+
+```rego
+# This code is in `robertson_farm/service.rego`.
+# The Rego package declaration should mach the filesystem path.
+package robertson_farm.service
+
+# Import the Teadal RBAC library to verify Keycloak credentials
+# and enforce the RBAC rules defined in our RBAC DB.
+import data.authnz.envopa as envopa
+import data.config.oidc as oidc_config
+# Import our RBAC DB.
+import data.robertson_farm.rbacdb as rbac_db
+
+# Let the library do the heavy lifting for us.
+default allow := false
+allow = true {
+    user := envopa.allow(rbac_db, oidc_config)
+}
+```
+
+For the policy to have effect, the developers needs to add the above
+`allow` rule to the list of rules in the Rego entry module whose code
+is in `security/opa/rego/main.rego`. The Rego snippet below shows how
+to do that.
+
+```rego
+# Add this to the import section:
+import data.robertson_farm.service as robertson_farm
+
+# ...other imports and code...
+
+# Add this to the end of the file:
+allow {
+    robertson_farm.allow
+}
+```
 
 
 ### Routing external traffic to the service
+
+
+
+
+
+[sec]: ../sec-design/README.md
