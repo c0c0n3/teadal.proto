@@ -329,9 +329,56 @@ allow {
 }
 ```
 
+As mentioned earlier, for this code to be deployed to the Teadal
+cluster, the developer has to open a pull request to merge it into
+the Teadal cluster repository main line. Shortly after merging, OPA
+will evaluate the policy during authorisation decisions.
+
 
 ### Routing external traffic to the service
 
+Typically, SFDPs are consumed by clients external to the Teadal
+cluster and this is the case for the `robertson-farm` SFDP too.
+The developer decides to route requests by URL path instead of
+domain name so to expose the SFDP endpoints at the URLs:
+- `https://my-teadal.eu/robertson-farm/config`
+- `https://my-teadal.eu/robertson-farm/data`
+
+Teadal, through Istio, has built-in support for this scenario. In
+fact, the *mesh infrastructure* layer directory contains an
+`istio/routing/http.yaml` which defines an Istio virtual service
+to route external HTTP traffic to internal cluster services. All
+the developer needs to do is edit this YAML file to add a `match`
+stanza for rewriting the above URL paths into `/config` and `/data`
+as shown in the YAML snippet below.
+
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: "http-virtual-service"
+spec:
+  # ...other spec stanzas...
+  http:
+  # Add this `match` stanza to route external traffic to the SFDP.
+  - match:
+    - uri:
+        prefix: /robertson-farm/
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: robertson-farm.default.svc.cluster.local
+        port:
+          number: 80
+  # ...other routes...
+```
+
+As mentioned earlier, for this route to be deployed to the Teadal
+cluster, the developer has to open a pull request to merge the updated
+YAML file into the Teadal cluster repository main line. Shortly after
+merging, Istio will route external requests to the `robertson-farm`
+SFDP.
 
 
 
