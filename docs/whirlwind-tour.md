@@ -249,4 +249,4 @@ secret.
 
 
 [httpbin-rbac]: ../deployment/mesh-infra/security/opa/rego/httpbin/rbacdb.rego
-[sec]: ./sec-design/README.md
+[sec]: ./arch/sec-design/README.md

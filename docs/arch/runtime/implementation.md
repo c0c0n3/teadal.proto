@@ -22,7 +22,7 @@ desired runtime with the actual cluster state.
 
 Each Teadal cluster includes a backbone software stack on which
 cluster-specific data services run. This stack implements the data
-and service mesh architecture outlined in D2.2. [**TODO**: cite].
+and service mesh architecture outlined in D2.3. [**TODO**: cite].
 The backbone stack also includes the Teadal components (Catalogue,
 Advocate, TEE, Pipelines, Policies, etc.) that allow producers and
 consumers to share data in a trustworthy and secure way, according
@@ -182,4 +182,4 @@ and reducing maintenance overhead.
 
 [dia.cluster-repos]: ./cluster-repos.png
 [dia.gitops]: ./gitops.png
-[dia.tech-stack]: ./teadal.proto.png
+[dia.tech-stack]: ./cluster-tech-stack.png
