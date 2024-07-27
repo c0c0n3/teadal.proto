@@ -182,4 +182,4 @@ and reducing maintenance overhead.
 
 [dia.cluster-repos]: ./cluster-repos.png
 [dia.gitops]: ./gitops.png
-[dia.tech-stack]: ./teadal.proto.png
+[dia.tech-stack]: ./cluster-tech-stack.png
