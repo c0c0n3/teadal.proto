@@ -312,7 +312,7 @@ allow = true {
 }
 ```
 
-For the policy to have effect, the developers needs to add the above
+For the policy to have effect, the developer needs to add the above
 `allow` rule to the list of rules in the Rego entry module whose code
 is in `security/opa/rego/main.rego`. The Rego snippet below shows how
 to do that.
@@ -346,11 +346,11 @@ domain name so to expose the SFDP endpoints at the URLs:
 
 Teadal, through Istio, has built-in support for this scenario. In
 fact, the *mesh infrastructure* layer directory contains an
-`istio/routing/http.yaml` which defines an Istio virtual service
+`istio/routing/http.yaml` file which defines an Istio virtual service
 to route external HTTP traffic to internal cluster services. All
 the developer needs to do is edit this YAML file to add a `match`
-stanza for rewriting the above URL paths into `/config` and `/data`
-as shown in the YAML snippet below.
+stanza for rewriting the above URL paths into `/config` and `/data`,
+respectively, as shown in the YAML snippet below.
 
 ```yaml
 apiVersion: networking.istio.io/v1beta1
