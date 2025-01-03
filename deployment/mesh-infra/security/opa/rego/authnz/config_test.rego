@@ -40,6 +40,75 @@ package authnz.config
 jwt_user_field_name := "email"
 
 #
+# The name of the JWT field containing a list of role names. You set
+# this value to tell `authnz` which token payload field contains the
+# list of role names you'd like to use for authorisation checks. These
+# are additional roles defined in the IdM that issues the JWT and which
+# the IdM associates users with. Notice that `authnz` expects this field
+# to be an array, so you've got to configure your IdM accordingly.
+#
+# Instead of defining roles and user-to-role mappings in your RBAC DB,
+# you could define roles and user-to-role mappings in your IdM and then
+# just reference those roles in the role-to-perms map in your RBAC DB.
+# `authnz` collects these role labels from the JWT and associates them
+# to the user specified in the JWT. This way you won't have to provide
+# your own `user_to_roles` map in the RBAC DB. (Or better, you could,
+# in which case `authnz` will merge all the roles found in `user_to_roles`
+# for the given user with those listed in the JWT array having the name
+# `jwt_roles_field_name`.)
+#
+# Notice you should set the `jwt_roles_field_name` variable to an empty
+# string or zap it to make `authnz` only use the roles and user-to-role
+# mappings defined in your RBAC DB.
+#
+# The easiest, but less flexible way of using JWT roles with Keycloak
+# is to define a group for each role you want to use and then add users
+# to groups. There's a built-in mapper you can use to output an array
+# containing the groups a user is a member of in a JWT field of your
+# choice. For instance, here's a payload snippet from a token Keycloak
+# issued to a user named `sebs` having an email of `sebs@teadal.eu` and
+# who's a member of the `g1` and `g2` groups:
+#
+#    {
+#        "iss": "http://localhost/keycloak/realms/master",
+#        "sub": "152f391c-8d9c-4c7c-a67b-924956d8892c",
+#        "preferred_username": "sebs",
+#        "email": "sebs@teadal.eu",
+#        "roles": ["g1", "g2"],
+#        ...
+#    }
+#
+# NOTE
+# ----
+# To reproduce the above config in Keycloak:
+#
+# $ docker run \
+#     -p 8080:8080 \
+#     -e KC_HTTP_ENABLED=true -e KC_HOSTNAME_STRICT=false \
+#     -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=abc123 \
+#     quay.io/keycloak/keycloak:21.1.2 \
+#     start
+#
+# Then log in as `admin` to:
+# 1. Create groups `g1` and `g2`.
+# 2. Create user `sebs`, member of above groups and w/ (non-temp)
+#    password `abc123`.
+# 3. Edit built-in `profile` client scope to add a "Group Membership"
+#    mapper whose "Token Claim Name" is `roles`.
+#    See:
+#    - https://stackoverflow.com/questions/76919561
+#    - https://i.sstatic.net/8wjyX.png
+#
+# Finally get an access token for `sebs`
+#
+# $ curl -s \
+#     http://localhost:8080/realms/master/protocol/openid-connect/token \
+#     -d 'grant_type=password' -d 'client_id=admin-cli' \
+#     -d 'username=sebs' -d 'password=abc123' | jq -r '.access_token'
+#
+jwt_roles_field_name := "roles"
+
+#
 # Preferred URLs to retrieve issuer JWKs. A map (object) where each key
 # is an issuer URL and the key's corresponding value is the absolute URL
 # where the issuer makes its JWKs available for download. The key's URL
