@@ -61,7 +61,7 @@ jwt_user_field_name := "email"
 # string or zap it to make `authnz` only use the roles and user-to-role
 # mappings defined in your RBAC DB.
 #
-# The easiest, but less flexible way of using JWT roles with Keycloak
+# The easiest, but less flexible, way of using JWT roles with Keycloak
 # is to define a group for each role you want to use and then add users
 # to groups. There's a built-in mapper you can use to output an array
 # containing the groups a user is a member of in a JWT field of your
@@ -235,6 +235,7 @@ example_config := {
         "https://localhost": "http://authnz/openid-connect/certs"
     },
     "jwt_user_field_name": "sub",
+    "jwt_roles_field_name": "roles",
     "jwks": {
         "keys": [
             {
