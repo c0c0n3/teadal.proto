@@ -10,17 +10,23 @@
 package authnz.rbac
 
 
-# Find all the roles associated to the given user.
+# Find all the roles associated with the given user in the RBAC DB.
+# Return an empty list if there's no `user_to_roles` map or the map
+# has no entry for the given user.
+user_roles(rbac_db, user) := [] {
+    not rbac_db.user_to_roles[user]
+}
 user_roles(rbac_db, user) := roles {
+    rbac_db.user_to_roles
     roles := rbac_db.user_to_roles[user]
 }
 
-# Find all the permissions associated the the given role.
+# Find all the permissions associated with the given role.
 role_perms(rbac_db, role) := perms {
     perms := rbac_db.role_to_perms[role]
 }
 
-# Find all the permissions associated the the given user.
+# Find all the permissions associated with the given user.
 user_perms(rbac_db, user) := perms {
     roles := user_roles(rbac_db, user)
     perm_sets := { rbac_db.role_to_perms[k] | roles[k] }

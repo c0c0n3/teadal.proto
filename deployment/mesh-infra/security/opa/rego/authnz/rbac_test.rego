@@ -9,6 +9,14 @@ test_role_lookup {
     user_roles(rbac_db, "sebs") == { "product_consumer" }
 }
 
+test_role_lookup_when_no_user_to_roles_map {
+    user_roles({}, "jeejee") == []
+}
+
+test_role_lookup_when_user_not_in_user_to_roles_map {
+    user_roles(rbac_db, "im-not-there") == []
+}
+
 test_role_perms {
     role_perms(rbac_db, "product_owner") == {
         {
@@ -53,6 +61,9 @@ test_user_perms {
             "url_regex": "^/httpbin/get$"
         }
     }
+    user_perms(rbac_db, "not-there") ==
+        { 1 | 1 == 0 }
+    #   ^ empty set; sadly, {} is an empty object to Rego!
 }
 
 assert_user_can_do_anything_on_path(user, path) {
