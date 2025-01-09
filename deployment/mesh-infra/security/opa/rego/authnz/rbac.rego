@@ -17,7 +17,6 @@ user_roles(rbac_db, user) := [] {
     not rbac_db.user_to_roles[user]
 }
 user_roles(rbac_db, user) := roles {
-    rbac_db.user_to_roles
     roles := rbac_db.user_to_roles[user]
 }
 
