@@ -29,8 +29,11 @@ role_perms(rbac_db, role) := perms {
 # Find all the permissions associated with the given user.
 user_perms(rbac_db, user) := perms {
     roles := user_roles(rbac_db, user)
-    perm_sets := { rbac_db.role_to_perms[k] | roles[k] }
-    perms := union(perm_sets)
+    perms := { ps |
+        role := roles[_]
+        role_perms := rbac_db.role_to_perms[role]
+        ps := role_perms[_]
+    }
 }
 
 # Check the given user is allowed to carry out the requested operation
