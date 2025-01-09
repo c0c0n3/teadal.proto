@@ -58,9 +58,7 @@ user_perms(rbac_db, user, external_roles) := perms {
 # the roles found in the RBAC DB for the given user.
 #
 check(rbac_db, user, external_roles, request) {
-    all_roles := array.concat(user_roles(rbac_db, user), external_roles)
-    role := all_roles[_]
-    perm := rbac_db.role_to_perms[role][_]
+    perm := user_perms(rbac_db, user, external_roles)[_]
     perm.methods[_] == request.method
     regex.match(perm.url_regex, request.path)
 }
