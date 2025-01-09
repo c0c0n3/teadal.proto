@@ -30,6 +30,12 @@ role_to_perms := {
             "methods": http.read,
             "url_regex": "^/httpbin/get$"
         }
+    ],
+    "external_role": [  # defined in IdM and passed along thru JWT
+        {
+            "methods": http.read,
+            "url_regex": "^/httpbin/X"
+        }
     ]
 }
 

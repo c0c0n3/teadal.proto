@@ -2,6 +2,7 @@ package authnz.rbac
 
 import data.authnz.http as http
 import data.authnz.rbacdb as rbac_db
+import data.authnz.rbacdb_ext as ext_rbac_db
 
 
 test_role_lookup {
@@ -37,7 +38,7 @@ test_role_perms {
 }
 
 test_user_perms {
-    user_perms(rbac_db, "jeejee") == {
+    user_perms(rbac_db, "jeejee", []) == {
         {
             "methods": http.do_anything,
             "url_regex": "^/httpbin/anything/.*"
@@ -51,7 +52,7 @@ test_user_perms {
             "url_regex": "^/httpbin/get$"
         }
     }
-    user_perms(rbac_db, "sebs") == {
+    user_perms(rbac_db, "sebs", []) == {
         {
             "methods": http.read,
             "url_regex": "^/httpbin/anything/.*"
@@ -61,7 +62,63 @@ test_user_perms {
             "url_regex": "^/httpbin/get$"
         }
     }
-    user_perms(rbac_db, "not-there") ==
+    user_perms(rbac_db, "not-there", []) ==
+        { 1 | 1 == 0 }
+    #   ^ empty set; sadly, {} is an empty object to Rego!
+}
+
+test_user_perms_with_external_role {
+    user_perms(rbac_db, "sebs", ["external_role"]) == {
+        {
+            "methods": http.read,
+            "url_regex": "^/httpbin/anything/.*"
+        },
+        {
+            "methods": http.read,
+            "url_regex": "^/httpbin/get$"
+        },
+        {
+            "methods": http.read,
+            "url_regex": "^/httpbin/X"
+        }
+    }
+    user_perms(rbac_db, "not-there", ["external_role"]) == {
+        {
+            "methods": http.read,
+            "url_regex": "^/httpbin/X"
+        }
+    }
+}
+
+test_user_perms_with_ext_role_defs {
+    # NOTE user = "". The user is irrelevant in this scenario since
+    # we've got no user-to-roles map, the JWT holds the roles for the
+    # user at hand.
+    user_perms(ext_rbac_db, "", ["product_owner", "product_consumer"]) == {
+        {
+            "methods": http.do_anything,
+            "url_regex": "^/httpbin/anything/.*"
+        },
+        {
+            "methods": http.read,
+            "url_regex": "^/httpbin/anything/.*"
+        },
+        {
+            "methods": http.read,
+            "url_regex": "^/httpbin/get$"
+        }
+    }
+    user_perms(ext_rbac_db, "", ["product_consumer"]) == {
+        {
+            "methods": http.read,
+            "url_regex": "^/httpbin/anything/.*"
+        },
+        {
+            "methods": http.read,
+            "url_regex": "^/httpbin/get$"
+        }
+    }
+    user_perms(ext_rbac_db, "", []) ==
         { 1 | 1 == 0 }
     #   ^ empty set; sadly, {} is an empty object to Rego!
 }

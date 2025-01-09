@@ -27,10 +27,17 @@ role_perms(rbac_db, role) := perms {
 }
 
 # Find all the permissions associated with the given user.
-user_perms(rbac_db, user) := perms {
-    roles := user_roles(rbac_db, user)
+#
+# The external roles param must be an array (never undefined!) holding
+# the names of any roles the user may have been assigned in an external
+# system and that are referenced in the RBAC DB permission definitions.
+# If the array isn't empty, then the contained labels will be added to
+# the roles found in the RBAC DB for the given user.
+#
+user_perms(rbac_db, user, external_roles) := perms {
+    all_roles := array.concat(user_roles(rbac_db, user), external_roles)
     perms := { ps |
-        role := roles[_]
+        role := all_roles[_]
         role_perms := rbac_db.role_to_perms[role]
         ps := role_perms[_]
     }
