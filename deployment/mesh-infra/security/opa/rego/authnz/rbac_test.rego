@@ -35,6 +35,12 @@ test_role_perms {
             "url_regex": "^/httpbin/get$"
         }
     ]
+    role_perms(rbac_db, "external_role") == [
+        {
+            "methods": http.read,
+            "url_regex": "^/httpbin/X"
+        }
+    ]
 }
 
 test_user_perms {
