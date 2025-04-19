@@ -65,27 +65,7 @@ allow(rbac_db, config) := user if {
 # `r := "okay" { x := {}["x"]; 1 == 1 }` actually evaluates to undefined.
 #
 
-jwt_roles(payload, cfg) := [] if {
-    # cater for "jwt_roles_field_name" not being present in config.
-    not cfg["jwt_roles_field_name"]
-}
-jwt_roles(payload, cfg) := [] if {
-    not payload[cfg.jwt_roles_field_name]
-}
+default jwt_roles(_, _) := []
 jwt_roles(payload, cfg) := roles if {
     roles := payload[cfg.jwt_roles_field_name]
 }
-# NOTE
-# ----
-# 1. Cleaner code. With a newer version of OPA we should be able to
-# take advantage of the `default` keyword for functions to simplify
-# the definition:
-#
-#   default jwt_roles(_) := []
-#   jtw_roles(payload, cfg) := roles {
-#       roles := payload[cfg.jwt_roles_field_name]
-#   }
-#
-# `default` function values don't work in `0.53.1`---the OPA version
-# we've got at the moment:
-# - https://github.com/open-policy-agent/opa/issues/2445
