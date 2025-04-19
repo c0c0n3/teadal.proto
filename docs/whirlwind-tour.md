@@ -154,17 +154,27 @@ that defines two roles:
   URL `/httpbin/get`.
 
 `jeejee@teadal.eu` is both a product owner and consumer, whereas
-`sebs@teadal.eu` is just a consumer. To interact with HttpBin, both
-users need to get a JWT from Keycloak and attach it to service requests
-since the policy doesn't allow anonymous requests to the above URLs.
-In fact, if you try e.g.
+`sebs@teadal.eu` is just a consumer. There's also a third role,
+`monitor`, which is only defined in Keycloak as a group in the
+Teadal realm and `jeejee@teadal.eu` is the only group member. The
+policy references this external role to grant access to the IP echo
+endpoint at `/httpbin/ip`. Keycloak is configured to output a `roles`
+field in the access token (see below) it issues for its users. This
+field is an array containing all the groups the user is a member of.
+So `roles: [monitor]` for `jeejee@teadal.eu` whereas `roles: []` for
+`sebs@teadal.eu`.
+
+To interact with HttpBin, both users need to get a JWT from Keycloak
+and attach it to service requests since the policy doesn't allow
+anonymous requests to the above URLs. In fact, if you try e.g.
 
 ```bash
 $ curl -i -X GET localhost/httpbin/anything/do
 $ curl -i -X GET localhost/httpbin/get
+$ curl -i -X GET localhost/httpbin/ip
 ```
 
-you should get back a fat `403` in both cases. So let's get a JWT
+you should get back a fat `403` in each cases. So let's get a JWT
 for `jeejee@teadal.eu`. We'll store it in a env var so we can use
 it later. The command below should do the trick. (If you've changed
 the user's password in Keycloak, replace `abc123` with the new one.)
@@ -217,8 +227,8 @@ $ curl -i -X DELETE localhost/httpbin/anything/do \
 ```
 
 You should see a `200` response for the first request, but a `403`
-for the second. Finally, since both users are product consumers,
-they should both allowed to `GET /httpbin/get`
+for the second. Also, since both users are product consumers, they
+should both allowed to `GET /httpbin/get`
 
 ```bash
 $ curl -i -X GET localhost/httpbin/get \
@@ -227,8 +237,19 @@ $ curl -i -X GET localhost/httpbin/get \
        -H "Authorization: Bearer ${sebs_token}"
 ```
 
-You should see a `200` response in both cases. That just about wraps
-it up for the security show.
+You should see a `200` response in both cases. Finally, members of
+the `monitor` group should be allowed to `GET /httpbin/ip`. Since
+`jeejee@teadal.eu` is a member and `sebs@teadal.eu` is not, the below
+requests should return `200` and `403`, respectively.
+
+```bash
+$ curl -i -X GET localhost/httpbin/ip \
+       -H "Authorization: Bearer ${jeejees_token}"
+$ curl -i -X GET localhost/httpbin/ip \
+       -H "Authorization: Bearer ${sebs_token}"
+```
+
+That just about wraps it up for the security show.
 
 
 ### DBs

@@ -15,13 +15,13 @@ product_consumer := "product_consumer"
 # Each permission object specifies a set of allowed HTTP methods for
 # the Web resources identified by the URLs matching the given regex.
 role_to_perms := {
-    product_owner: {
+    product_owner: [
         {
             "methods": http.do_anything,
             "url_regex": "^/httpbin/anything/.*"
         }
-    },
-    product_consumer: {
+    ],
+    product_consumer: [
         {
             "methods": http.read,
             "url_regex": "^/httpbin/anything/.*"
@@ -30,11 +30,17 @@ role_to_perms := {
             "methods": http.read,
             "url_regex": "^/httpbin/get$"
         }
-    }
+    ],
+    "external_role": [  # defined in IdM and passed along thru JWT
+        {
+            "methods": http.read,
+            "url_regex": "^/httpbin/X"
+        }
+    ]
 }
 
 # Map each user to their roles.
 user_to_roles := {
-    "jeejee": { product_owner, product_consumer },
-    "sebs": { product_consumer }
+    "jeejee": [ product_owner, product_consumer ],
+    "sebs": [ product_consumer ]
 }
