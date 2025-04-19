@@ -24,12 +24,12 @@ package authnz.oidc
 #   pass in `input.attributes.request.http` for the request param.
 # - config. An object containing `authnz` config---see the config test
 #   for explanations.
-claims(request, config) := payload {
+claims(request, config) := payload if {
     config.jwks
     token := bearer_token(request)
     payload := token_payload(token, config.jwks)
 }
-claims(request, config) := payload {
+claims(request, config) := payload if {
     not config.jwks
     token := bearer_token(request)
     [_, p, _] := io.jwt.decode(token)
@@ -61,7 +61,7 @@ claims(request, config) := payload {
 #   verify the token signature. Notice this is a Rego object holding the JWKs
 #   JSON data, typically retrieved from a URL discovered through the issuer's
 #   well-known OIDC config endpoint.
-token_payload(token, jwks) := payload {
+token_payload(token, jwks) := payload if {
     # Call `decode_verify` to extract token data and verify its signature.
     # Convert the Rego `jwks` object back to a JSON string. (Weirdly enough,
     # `decode_verify` won't work with the Rego object.)
@@ -97,7 +97,7 @@ token_payload(token, jwks) := payload {
 # in an object map called `headers`. Typically, when using the OPA Envoy
 # plugin, you'd pass in `input.attributes.request.http` for the request
 # param.
-bearer_token(request) := token {
+bearer_token(request) := token if {
     auth := request.headers.authorization
     startswith(auth, "Bearer ")
     token := substring(auth, count("Bearer "), -1)
@@ -115,7 +115,7 @@ bearer_token(request) := token {
 #   url_lookup["https://keycloak.external"] =
 #       http://kc.internal/realms/master/protocol/openid-connect/certs
 # then use this ^ URL to download the JWKS.
-token_jwks(token_payload, url_lookup) = jwks {
+token_jwks(token_payload, url_lookup) = jwks if {
     url := preferred_token_jwks_url(token_payload, url_lookup)
     print("Downloading JWKS for: ", token_payload.iss,
           " from preferred JWKS URL: ", url)
@@ -126,7 +126,7 @@ token_jwks(token_payload, url_lookup) = jwks {
 # If there's no preferred URL configured in `url_lookup`, then use the
 # issuer's OIDC well-known config to find out where to download the JWKS
 # from.
-token_jwks(token_payload, url_lookup) = jwks {
+token_jwks(token_payload, url_lookup) = jwks if {
     not preferred_token_jwks_url(token_payload, url_lookup)
 
     print("Fetching JWKS for: ", token_payload.iss,
@@ -141,14 +141,14 @@ token_jwks(token_payload, url_lookup) = jwks {
 # Extract scheme and authority from `token_payload` and use it as a
 # key to look up the preferred JWKS download URL in the `url_lookup`
 # map.
-preferred_token_jwks_url(token_payload, url_lookup) := url {
+preferred_token_jwks_url(token_payload, url_lookup) := url if {
     base_url := regex.find_n("^[^:]+://[^/]+", token_payload.iss, 1)[_]
     url := url_lookup[base_url]
 }
 
 # Use `token_payload.iss` as a base URL to build the well-known OIDC
 # config URL.
-token_issuer_config_url(token_payload) = url {
+token_issuer_config_url(token_payload) = url if {
     not endswith(token_payload.iss, "/")
     config_path := ".well-known/openid-configuration"
     url := concat("/", [token_payload.iss, config_path])
@@ -156,7 +156,7 @@ token_issuer_config_url(token_payload) = url {
 
 # Use `token_payload.iss` as a base URL to build the well-known OIDC
 # config URL.
-token_issuer_config_url(token_payload) = url {
+token_issuer_config_url(token_payload) = url if {
     endswith(token_payload.iss, "/")
     config_path := ".well-known/openid-configuration"
     url := concat("", [token_payload.iss, config_path])
@@ -169,7 +169,7 @@ token_issuer_config_url(token_payload) = url {
 # The `well_known_oidc_url` param is the absolute URL of the issuer's
 # well-known OIDC config endpoint, e.g.
 # https://my.keycloak/realms/master/.well-known/openid-configuration
-fetch_token_issuer_jwks_url(well_known_oidc_url) := url {
+fetch_token_issuer_jwks_url(well_known_oidc_url) := url if {
     response := http.send(
         {
             "url": well_known_oidc_url,
@@ -185,7 +185,7 @@ fetch_token_issuer_jwks_url(well_known_oidc_url) := url {
 # Cache them for one day.
 # The `url` param is the absolute URL of the issuer's JWKS endpoint, e.g.
 # https://my.keycloak/realms/master/protocol/openid-connect/certs.
-fetch_token_jwks(url) := jwks {
+fetch_token_jwks(url) := jwks if {
     response := http.send(
         {
             "url": url,

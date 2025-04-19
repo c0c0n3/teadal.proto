@@ -11,13 +11,15 @@ in buildGoModule rec {
     owner = "open-policy-agent";
     repo = "opa-envoy-plugin";
     rev = cfg.gitTag;
-    sha256 = "sha256-ng5hPk2R59OrB6PovhtbrPx+/dOFG4uiexQdPxyZfls=";
+    sha256 = "sha256-IJe/JKdsjJ0oJWa35UjxXHiVsm7M1mFwVx5oQ45uuSE=";
   };
-  vendorSha256 = null;
+  vendorHash = null;
   subPackages = [ "cmd/opa-envoy-plugin" ];
 
-  CGO_ENABLED = 0;                                            # NOTE (2)
-  WASM_ENABLED = 0;
+  env = {                                                     # NOTE (2)
+    CGO_ENABLED = 0;
+    WASM_ENABLED = 0;
+  };
   ldflags = [
     "-X github.com/open-policy-agent/opa/version.Version=${cfg.gitTag}"
   ];
@@ -30,8 +32,8 @@ in buildGoModule rec {
 # ----
 # 1. How to update this package. Usual procedure but remember to set
 # the src hash to `sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=`
-# intially to force downloading Go sources. Because there's a vendor
-# folder, `vendorSha256` needs to be `null`. In fact, `buildGoModule`
+# initially to force downloading Go sources. Because there's a vendor
+# folder, `vendorHash` needs to be `null`. In fact, `buildGoModule`
 # warns you about it
 #   vendor folder exists, please set
 #   'vendorHash = null;' or 'vendorSha256 = null;

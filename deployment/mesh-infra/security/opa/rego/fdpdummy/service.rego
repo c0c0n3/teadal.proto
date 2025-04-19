@@ -12,7 +12,7 @@ import data.fdpdummy.rbacdb as rbac_db
 
 default allow := false
 
-allow = true {
+allow = true if {
     user := envopa.allow(rbac_db, oidc_config)
 
     # Put below this line any service-specific checks on e.g. http_request

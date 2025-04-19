@@ -1,7 +1,7 @@
 package authnz.oidc
 
 
-test_preferred_token_jwks_url_1 {
+test_preferred_token_jwks_url_1 if {
     want := "http://keycloak/realms/master/protocol/openid-connect/certs"
     token_payload := {"iss": "http://localhost/keycloak/realms/master"}
     url_lookup := {
@@ -11,7 +11,7 @@ test_preferred_token_jwks_url_1 {
     got == want
 }
 
-test_preferred_token_jwks_url_2 {
+test_preferred_token_jwks_url_2 if {
     want := "http://oi.dc/certs"
     token_payload := {"iss": "http://localhost:8080"}
     url_lookup := {
@@ -21,7 +21,7 @@ test_preferred_token_jwks_url_2 {
     got == want
 }
 
-test_preferred_token_jwks_url_3 {
+test_preferred_token_jwks_url_3 if {
     want := "http://oi.dc/certs"
     token_payload := {"iss": "http://localhost:8080/"}
     url_lookup := {
@@ -31,7 +31,7 @@ test_preferred_token_jwks_url_3 {
     got == want
 }
 
-test_preferred_token_jwks_url_4 {
+test_preferred_token_jwks_url_4 if {
     want := "http://oi.dc/certs"
     token_payload := {"iss": "http://localhost:8080/p/q?v=1"}
     url_lookup := {
@@ -41,21 +41,21 @@ test_preferred_token_jwks_url_4 {
     got == want
 }
 
-test_token_issuer_config_url_1 {
+test_token_issuer_config_url_1 if {
     want := "https://key.cloak/realms/master/.well-known/openid-configuration"
     token_payload := {"iss": "https://key.cloak/realms/master"}
     got := token_issuer_config_url(token_payload)
     got == want
 }
 
-test_token_issuer_config_url_2 {
+test_token_issuer_config_url_2 if {
     want := "https://key.cloak/realms/master/.well-known/openid-configuration"
     token_payload := {"iss": "https://key.cloak/realms/master/"}
     got := token_issuer_config_url(token_payload)
     got == want
 }
 
-test_token_jwks_preferred_url {
+test_token_jwks_preferred_url if {
     token_payload := {"iss": "http://localhost/keycloak/realms/master"}
     url_lookup := {
         "http://localhost": "http://localhost/keycloak/realms/master/protocol/openid-connect/certs"
@@ -65,7 +65,7 @@ test_token_jwks_preferred_url {
     jwks.keys  # assert present
 }
 
-test_token_jwks_canonical_url {
+test_token_jwks_canonical_url if {
     token_payload := {"iss": "http://localhost/keycloak/realms/master"}
     url_lookup := { }
     jwks := token_jwks(token_payload, url_lookup)
@@ -74,7 +74,7 @@ test_token_jwks_canonical_url {
     jwks.keys  # assert present
 }
 
-test_extract_bearer_token {
+test_extract_bearer_token if {
     dummy_jwt := "header.payload.signature"
     request := {
         "headers": {
@@ -84,7 +84,7 @@ test_extract_bearer_token {
     bearer_token(request) == dummy_jwt
 }
 
-test_extract_token_payload_with_valid_jwt {
+test_extract_token_payload_with_valid_jwt if {
     payload := {
         "sub": "vans",
         "nbf": 3600,        # 1hr since the epoc
@@ -94,7 +94,7 @@ test_extract_token_payload_with_valid_jwt {
     payload == token_payload(token, jwks_tasty_config)
 }
 
-test_extract_token_payload_with_expired_jwt {
+test_extract_token_payload_with_expired_jwt if {
     payload := {
         "sub": "vans",
         "nbf": 3600,        # 1hr since the epoc
@@ -104,7 +104,7 @@ test_extract_token_payload_with_expired_jwt {
     not token_payload(token, jwks_tasty_config)
 }
 
-test_extract_token_payload_with_nbf_in_the_future {
+test_extract_token_payload_with_nbf_in_the_future if {
     payload := {
         "sub": "vans",
         "nbf": 10000000000, # 20 Nov 2286 @ 18:46:40 (CET)
@@ -114,7 +114,7 @@ test_extract_token_payload_with_nbf_in_the_future {
     not token_payload(token, jwks_tasty_config)
 }
 
-test_claims_with_static_jwks {
+test_claims_with_static_jwks if {
     config := {
         "jwks": jwks_tasty_config
     }
@@ -131,7 +131,7 @@ test_claims_with_static_jwks {
     payload == claims(request, config)
 }
 
-test_claims_with_dynamic_jwks {
+test_claims_with_dynamic_jwks if {
     config := {
         "jwks_preferred_urls": {
             "http://mock": "http://mock/jwks"

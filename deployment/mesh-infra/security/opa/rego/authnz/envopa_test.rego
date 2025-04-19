@@ -10,7 +10,7 @@ oidc_config := {
     "jwks": oidc.jwks_tasty_config
 }
 
-make_request(path, method, user, roles) := envoy_input {
+make_request(path, method, user, roles) := envoy_input if {
     payload := {
         "iss": "me",
         "exp": 10000000000,  # 20 Nov 2286 @ 18:46:40 (CET)
@@ -34,7 +34,7 @@ make_request(path, method, user, roles) := envoy_input {
     }
 }
 
-test_jwt_roles_no_roles_field_in_config {
+test_jwt_roles_no_roles_field_in_config if {
     payload := {
         "roles": ["r"]
     }
@@ -43,7 +43,7 @@ test_jwt_roles_no_roles_field_in_config {
     roles == []
 }
 
-test_jwt_roles_empty_roles_field_in_config {
+test_jwt_roles_empty_roles_field_in_config if {
     payload := {
         "roles": ["r"]
     }
@@ -54,7 +54,7 @@ test_jwt_roles_empty_roles_field_in_config {
     roles == []
 }
 
-test_jwt_roles_missing_roles_field_in_payload {
+test_jwt_roles_missing_roles_field_in_payload if {
     payload := { }
     oidc_cfg := {
         "jwt_roles_field_name": "roles"
@@ -63,7 +63,7 @@ test_jwt_roles_missing_roles_field_in_payload {
     roles == []
 }
 
-test_jwt_roles_when_roles_field_in_payload {
+test_jwt_roles_when_roles_field_in_payload if {
     payload := {
         "roles": ["r"]
     }
@@ -74,14 +74,14 @@ test_jwt_roles_when_roles_field_in_payload {
     roles == ["r"]
 }
 
-test_product_owner_can_delete {
+test_product_owner_can_delete if {
     user := allow(rbac_db, oidc_config)
         with input as make_request(
             "/httpbin/anything/", "DELETE", "jeejee", ["product_owner"])
     user == "jeejee"
 }
 
-test_product_consumer_cant_delete {
+test_product_consumer_cant_delete if {
     not allow(rbac_db, oidc_config)
         with input as make_request(
             "/httpbin/anything/", "DELETE", "sebs", ["product_consumer"])
