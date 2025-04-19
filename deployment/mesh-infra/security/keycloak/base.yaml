@@ -86,3 +86,75 @@ spec:
       - name: teadal-realm-bootstrap
         configMap:
           name: teadal-realm-bootstrap
+
+# NOTE
+# ----
+# 1. Resetting Keycloak. Since we import the Teadal realm on startup,
+# you can just zap the contents of the DB directory to start again
+# from a clean slate. Obviously, this is only an option when testing,
+# not in a prod scenario! Anyhoo, if you really want to do this, then
+# you can follow a procedure similar to the one below.
+#
+# $ kubectl scale --replicas=0 deployment/keycloak
+# $ kubectl get pv | grep keycloak | cut -f1 -d' ' \
+#                  | xargs -n1 kubectl describe pv | grep Path:
+#     Path:  /data/d1
+# $ ssh -p 10022 admin@localhost
+# $ ls /data/d1/
+#     keycloakdb.lock.db  keycloakdb.mv.db  keycloakdb.trace.db
+# $ rm /data/d1/key*
+# $ exit
+# $ kubectl scale --replicas=1 deployment/keycloak
+#
+# 2. Teadal realm export. Here's how.
+#
+# $ kustomize build mesh-infra/security/keycloak/ | kubectl delete -f -
+# $ emacs mesh-infra/security/keycloak/base.yaml
+#     replace container args with the following:
+#         - export
+#         - --realm
+#         - teadal
+#         - --users
+#         - realm_file
+#         - --file
+#         - /opt/keycloak/data/h2/teadal-bootstrap.json
+# $ kustomize build mesh-infra/security/keycloak/ | kubectl apply -f -
+# $ kubectl get pod    # wait until export done
+# $ kubectl get pv | grep keycloak | cut -f1 -d' ' \
+#                  | xargs -n1 kubectl describe pv | grep Path:
+#     Path:  /data/d1
+# $ scp -P 10022 \
+#     admin@localhost:/data/d1/teadal-bootstrap.json \
+#     mesh-infra/security/keycloak/teadal-bootstrap.json
+# # ^ can't use `kubectl cp` b/c there's no `tar` in Keycloak image.
+# $ emacs mesh-infra/security/keycloak/base.yaml
+#     put back original container args
+# $ kustomize build mesh-infra/security/keycloak/ | kubectl apply -f -
+#
+# 3. Teadal realm from scratch. To recreate the Teadal realm from
+# scratch, you should
+# - Redeploy Keycloak to make it start w/o realm import.
+# - Reset Keycloak---see note above about it.
+# - Create & populate the Teadal realm.
+# - Export the realm---see note above about it.
+# - Reset Keycloak.
+# - Redeploy Keycloak to make it start w/ realm import as usual.
+#
+# Here's how to create and populate the Teadal realm.
+# - Browse to the admin console and log in with the admin username
+#   and password you set in the Keycloak K8s secret.
+# - Create a new realm called `teadal` and switch to that realm.
+# - Create two users, `jeejee@teadal.eu` (=email, username: `jeejee`)
+#   and `sebs@teadal.eu` (=email, username: `sebs`), both having log-in
+#   enabled and a (non-temp) password of `abc123`. Take care of turning
+#   on the "Email verified" option for both users.
+# - Create a group called `monitor` and make `jeejee@teadal.eu`
+#   a member of that group.
+# - Edit the built-in `profile` client scope to add a "Group Membership"
+#   mapper---select the "By configuration" option after hitting the add
+#   add button. Set the "Token Claim Name" to `roles` and take care to
+#   turn on the "Add to access token" option.
+#   See:
+#   - https://stackoverflow.com/questions/76919561
+#   - https://i.sstatic.net/8wjyX.png
+#

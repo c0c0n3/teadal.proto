@@ -94,7 +94,8 @@ jwt_user_field_name := "email"
 # 2. Create user `sebs`, member of above groups and w/ (non-temp)
 #    password `abc123`.
 # 3. Edit built-in `profile` client scope to add a "Group Membership"
-#    mapper whose "Token Claim Name" is `roles`.
+#    mapper whose "Token Claim Name" is `roles`, taking care to turn
+#    on the "Add to access token" option.
 #    See:
 #    - https://stackoverflow.com/questions/76919561
 #    - https://i.sstatic.net/8wjyX.png
