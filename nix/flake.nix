@@ -5,6 +5,8 @@
     nixpkgs.url = "github:NixOs/nixpkgs/nixos-23.05";
     nixpkgs-unstable.url = "github:NixOs/nixpkgs/645ff62e09d294a30de823cb568e9c6d68e92606";
                                                # ^ nixos-unstable branch on 01 Jul 2023.
+    nixpkgs-opa.url = "github:NixOs/nixpkgs/5cc587d124658390d65a28d6b5f9132ef86c157a";
+                                               # ^ master branch on 19 Apr 2025.
     nixie = {
       url = "github:c0c0n3/nixie";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -15,7 +17,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, nixie, gomod2nix }:
+  outputs = { self, nixpkgs, nixpkgs-unstable, nixpkgs-opa, nixie, gomod2nix }:
   let
     inputPkgs = nixpkgs // {
       mkOverlays = system: [
@@ -24,7 +26,7 @@
           argocd = nixpkgs-unstable.legacyPackages.${system}.argocd;
           istioctl = nixpkgs-unstable.legacyPackages.${system}.istioctl;
           open-policy-agent =
-            nixpkgs-unstable.legacyPackages.${system}.open-policy-agent;
+            nixpkgs-opa.legacyPackages.${system}.open-policy-agent;
         })
       ];
     };
