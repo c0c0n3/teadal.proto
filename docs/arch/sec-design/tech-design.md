@@ -269,6 +269,60 @@ useful for dry-run scenarios where a policy writer may want to see
 what is the effect of their RBAC rules before deploying them to the
 data lake.
 
+#### Mapping users to roles
+In the previous example, roles were defined in Rego along with the
+mapping of users to roles. It is also possible to define roles in
+the IdM where users are kept and use the IdM's tools to associate
+users to roles. In this case, the Rego policy would only contain the
+`role_to_perms` map associating each role defined in the IdM to a
+list of permission objects as shown in the example below.
+
+```rego
+role_to_perms := {
+    "product_owner": [
+        {
+            "methods": [ "GET", "POST", "DELETE" ],
+            "url_regex": "^/patients/.*"
+        }
+    ],
+    "product_consumer": [
+        {
+            "methods": [ "GET" ],
+            "url_regex": "^/patients/age$"
+        },
+        {
+            "methods": [ "GET" ],
+            "url_regex": "^/status$"
+        }
+    ]
+}
+```
+
+This Rego code defines a policy that has the same effect as that
+presented earlier where users were explicitly associated to roles
+through the `user_to_roles` map.
+
+A mixed scenario is also possible, where some roles are defined in
+the IdM and others in Rego policies—the [Whirlwind Tour][wt] section
+provides an example of this. Regardless of the approach, if some (or
+all) roles are managed in the IdM, then:
+- the IdM must generate access tokens that include not only the
+  authenticated user's ID, but also a list of roles the user
+  belongs to; and
+- `authnz` must be configured to read both the user ID and the
+  roles from the access token.
+
+In this setup, `authnz` merges any roles extracted from the token
+with the roles defined for that user in Rego. More precisely, let
+`R(u)` be the set of roles for a given user `u`, as defined in the
+`user_to_roles` map within the Rego policy. If `user_to_roles` is
+not defined, or it contains no entry for user `u`, then `R(u)` is
+the empty set. Similarly, let `T(u)` be the set of roles found in
+the access token issued to user `u`. If the token includes no roles,
+then `T(u)` is also the empty set. The set of roles that `authnz`
+uses to evaluate the policy for user `u` is the union of these two
+sets: `R(u) ∪ T(u)`.
+
 
 ### Alternative policy decision points
 
@@ -322,3 +376,4 @@ policies to the plug-in at regular intervals.
 [security-overview.dia]: ./istio-opa-security.svg
 [souffle]: https://souffle-lang.github.io/
 [wac]: https://solid.github.io/web-access-control-spec/
+[wt]: ../../whirlwind-tour.md#security
