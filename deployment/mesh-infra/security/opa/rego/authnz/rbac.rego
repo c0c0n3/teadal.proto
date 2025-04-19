@@ -13,15 +13,15 @@ package authnz.rbac
 # Find all the roles associated with the given user in the RBAC DB.
 # Return an empty list if there's no `user_to_roles` map or the map
 # has no entry for the given user.
-user_roles(rbac_db, user) := [] {
+user_roles(rbac_db, user) := [] if {
     not rbac_db.user_to_roles[user]
 }
-user_roles(rbac_db, user) := roles {
+user_roles(rbac_db, user) := roles if {
     roles := rbac_db.user_to_roles[user]
 }
 
 # Find all the permissions associated with the given role.
-role_perms(rbac_db, role) := perms {
+role_perms(rbac_db, role) := perms if {
     perms := rbac_db.role_to_perms[role]
 }
 
@@ -33,7 +33,7 @@ role_perms(rbac_db, role) := perms {
 # If the array isn't empty, then the contained labels will be added to
 # the roles found in the RBAC DB for the given user.
 #
-user_perms(rbac_db, user, external_roles) := perms {
+user_perms(rbac_db, user, external_roles) := perms if {
     all_roles := array.concat(user_roles(rbac_db, user), external_roles)
     perms := { ps |
         role := all_roles[_]
@@ -56,7 +56,7 @@ user_perms(rbac_db, user, external_roles) := perms {
 # If the array isn't empty, then the contained labels will be added to
 # the roles found in the RBAC DB for the given user.
 #
-check(rbac_db, user, external_roles, request) {
+check(rbac_db, user, external_roles, request) if {
     perm := user_perms(rbac_db, user, external_roles)[_]
     perm.methods[_] == request.method
     regex.match(perm.url_regex, request.path)

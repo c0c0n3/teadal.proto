@@ -17,19 +17,19 @@ import data.minio.service as minio
 
 default allow := false
 
-allow {
+allow if {
     fdpdummy.allow
 }
 
 # or
 
-allow {
+allow if {
     httpbin.allow
 }
 
 # or
 
-allow {
+allow if {
     minio.allow
 }
 

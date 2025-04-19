@@ -5,20 +5,20 @@ import data.authnz.rbacdb as rbac_db
 import data.authnz.rbacdb_ext as ext_rbac_db
 
 
-test_role_lookup {
+test_role_lookup if {
     user_roles(rbac_db, "jeejee") == [ "product_owner", "product_consumer" ]
     user_roles(rbac_db, "sebs") == [ "product_consumer" ]
 }
 
-test_role_lookup_when_no_user_to_roles_map {
+test_role_lookup_when_no_user_to_roles_map if {
     user_roles({}, "jeejee") == []
 }
 
-test_role_lookup_when_user_not_in_user_to_roles_map {
+test_role_lookup_when_user_not_in_user_to_roles_map if {
     user_roles(rbac_db, "im-not-there") == []
 }
 
-test_role_perms {
+test_role_perms if {
     role_perms(rbac_db, "product_owner") == [
         {
             "methods": http.do_anything,
@@ -43,7 +43,7 @@ test_role_perms {
     ]
 }
 
-test_user_perms {
+test_user_perms if {
     user_perms(rbac_db, "jeejee", []) == {
         {
             "methods": http.do_anything,
@@ -73,7 +73,7 @@ test_user_perms {
     #   ^ empty set; sadly, {} is an empty object to Rego!
 }
 
-test_user_perms_with_external_role {
+test_user_perms_with_external_role if {
     user_perms(rbac_db, "sebs", ["external_role"]) == {
         {
             "methods": http.read,
@@ -96,7 +96,7 @@ test_user_perms_with_external_role {
     }
 }
 
-test_user_perms_with_ext_role_defs {
+test_user_perms_with_ext_role_defs if {
     # NOTE user = "". The user is irrelevant in this scenario since
     # we've got no user-to-roles map, the JWT holds the roles for the
     # user at hand.
@@ -129,7 +129,7 @@ test_user_perms_with_ext_role_defs {
     #   ^ empty set; sadly, {} is an empty object to Rego!
 }
 
-assert_user_can_do_anything_on_path(user, path) {
+assert_user_can_do_anything_on_path(user, path) if {
     check(rbac_db, user, [], {"method": "GET", "path": path})
     check(rbac_db, user, [], {"method": "HEAD", "path": path})
     check(rbac_db, user, [], {"method": "OPTIONS", "path": path})
@@ -141,7 +141,7 @@ assert_user_can_do_anything_on_path(user, path) {
     check(rbac_db, user, [], {"method": "TRACE", "path": path})
 }
 
-assert_user_can_only_read_path(user, path) {
+assert_user_can_only_read_path(user, path) if {
     check(rbac_db, user, [], {"method": "GET", "path": path})
     check(rbac_db, user, [], {"method": "HEAD", "path": path})
     check(rbac_db, user, [], {"method": "OPTIONS", "path": path})
@@ -153,7 +153,7 @@ assert_user_can_only_read_path(user, path) {
     not check(rbac_db, user, [], {"method": "TRACE", "path": path})
 }
 
-test_check_perms {
+test_check_perms if {
     assert_user_can_do_anything_on_path("jeejee", "/httpbin/anything/")
     assert_user_can_only_read_path("sebs", "/httpbin/anything/")
     assert_user_can_only_read_path("jeejee", "/httpbin/get")

@@ -3,7 +3,7 @@ package httpbin.service
 import data.authnz.oidc as oidc
 
 
-jeejees_token := token {
+jeejees_token := token if {
     payload := {
         "email": "jeejee@teadal.eu",
         "exp": 10000000000  # 20 Nov 2286 @ 18:46:40 (CET)
@@ -12,7 +12,7 @@ jeejees_token := token {
 }
 jeejees_auth := oidc.make_bearer_auth(jeejees_token)
 
-sebs_token := token {
+sebs_token := token if {
     payload := {
         "email": "sebs@teadal.eu",
         "exp": 10000000000  # 20 Nov 2286 @ 18:46:40 (CET)
@@ -26,7 +26,7 @@ oidc_config := {
    "jwks": oidc.jwks_tasty_config
 }
 
-make_request(method, path, auth) := envoy_input {
+make_request(method, path, auth) := envoy_input if {
     envoy_input := {
         "attributes": {
             "request": {
@@ -42,7 +42,7 @@ make_request(method, path, auth) := envoy_input {
     }
 }
 
-assert_user_can_do_anything_on_path(path, user_auth) {
+assert_user_can_do_anything_on_path(path, user_auth) if {
     allow with input as make_request("GET", path, user_auth)
           with data.config.oidc as oidc_config
     allow with input as make_request("HEAD", path, user_auth)
@@ -63,7 +63,7 @@ assert_user_can_do_anything_on_path(path, user_auth) {
           with data.config.oidc as oidc_config
 }
 
-assert_user_can_only_read_path(path, user_auth) {
+assert_user_can_only_read_path(path, user_auth) if {
     allow with input as make_request("GET", path, user_auth)
           with data.config.oidc as oidc_config
     allow with input as make_request("HEAD", path, user_auth)
@@ -84,7 +84,7 @@ assert_user_can_only_read_path(path, user_auth) {
               with data.config.oidc as oidc_config
 }
 
-test_check_perms {
+test_check_perms if {
     assert_user_can_do_anything_on_path("/httpbin/anything/", jeejees_auth)
     assert_user_can_only_read_path("/httpbin/anything/", sebs_auth)
     assert_user_can_only_read_path("/httpbin/get", jeejees_auth)

@@ -49,7 +49,7 @@ import data.authnz.rbac as rbac
 # - rbac_db. The RBAC rules---see the RBAC DB tests for explanations.
 # - config. An object containing authnz config---see the config test
 #   for explanations.
-allow(rbac_db, config) := user {
+allow(rbac_db, config) := user if {
     payload := oidc.claims(http_request, config)
     user := payload[config.jwt_user_field_name]
     external_roles := jwt_roles(payload, config)               # (1)
@@ -65,14 +65,14 @@ allow(rbac_db, config) := user {
 # `r := "okay" { x := {}["x"]; 1 == 1 }` actually evaluates to undefined.
 #
 
-jwt_roles(payload, cfg) := [] {
+jwt_roles(payload, cfg) := [] if {
     # cater for "jwt_roles_field_name" not being present in config.
     not cfg["jwt_roles_field_name"]
 }
-jwt_roles(payload, cfg) := [] {
+jwt_roles(payload, cfg) := [] if {
     not payload[cfg.jwt_roles_field_name]
 }
-jwt_roles(payload, cfg) := roles {
+jwt_roles(payload, cfg) := roles if {
     roles := payload[cfg.jwt_roles_field_name]
 }
 # NOTE
