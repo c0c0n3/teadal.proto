@@ -27,6 +27,8 @@
           istioctl = nixpkgs-unstable.legacyPackages.${system}.istioctl;
           open-policy-agent =
             nixpkgs-opa.legacyPackages.${system}.open-policy-agent;
+          buildGoModule =
+            nixpkgs-opa.legacyPackages.${system}.buildGoModule;
         })
       ];
     };
