@@ -35,8 +35,9 @@ role_perms(rbac_db, role) := perms if {
 #
 user_perms(rbac_db, user, external_roles) := perms if {
     all_roles := array.concat(user_roles(rbac_db, user), external_roles)
+    all_roles_with_user := array.concat(all_roles, [user])
     perms := { ps |
-        role := all_roles[_]
+        role := all_roles_with_user[_]
         role_perms := rbac_db.role_to_perms[role]
         ps := role_perms[_]
     }
