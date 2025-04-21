@@ -172,6 +172,8 @@ assert_user_can_read_path_ext_db(user, roles, path) if {
 
 test_check_perms_ext_db if {
     assert_user_can_read_path_ext_db("sebs", [], "/httpbin/ip")
+    assert_user_can_read_path_ext_db(
+        "sebs", ["product_consumer"], "/httpbin/ip")
     not assert_user_can_read_path_ext_db("sebs", [], "/httpbin/get")
     assert_user_can_read_path_ext_db(
         "sebs", ["product_consumer"], "/httpbin/get")
