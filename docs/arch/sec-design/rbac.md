@@ -178,6 +178,56 @@ all) roles are managed in the IdM, then:
 In this setup, `authnz` merges any roles extracted from the token
 with the roles defined for that user in Rego.
 
+For added convenience, `authnz` treats each user as a singleton role.
+More precisely, `authnz` identifies every user `u` with a role named
+`u`, which contains only `u` as its member. For example, the user
+`sebs@teadal.eu` from the previous example implicitly has a corresponding
+role also named `sebs@teadal.eu`, with the user as its sole member.
+These implicit singleton roles allow policy writers to assign permissions
+directly to a user in the `role_to_perms` map, without needing to
+explicitly list the user as an additional role in the `user_to_roles`
+entry for that user.
+
+For example, suppose the policy writer wants to extend the previous
+policy with a rule specific to the user `sebs@teadal.eu`. As a product
+consumer, `sebs@teadal.eu` does not have access to service metrics.
+Without implicit singleton roles, the policy writer would need to
+manually add an entry to `user_to_roles` to associate `sebs@teadal.eu`
+with a role of the same name, in order to then add a corresponding
+entry for role `sebs@teadal.eu` to the `role_to_perms` map, as shown
+below.
+
+```rego
+role_to_perms := {
+    # ... same entries as earlier, plus
+    "sebs@teadal.eu": [
+        { "methods": ["GET"], "url_regex": "^/metrics/.*" }
+    ]
+}
+user_to_roles := {
+    # make `sebs@teadal.eu` a member of `sebs@teadal.eu` so the
+    # above `role_to_perms` works.
+    "sebs@teadal.eu": [ "sebs@teadal.eu" ]
+}
+```
+
+While this works, it is cumbersome and places an additional burden
+on the policy writer—especially when roles are managed externally
+in an IdM system. Ideally, in such cases, the policy writer should
+only need to specify the `role_to_perms` map, without also maintaining
+the `user_to_roles` map. With implicit singleton roles, there is no
+need to explicitly map users to roles of the same name. The policy
+writer can simply rewrite the code as follows:
+
+```rego
+role_to_perms := {
+    # ... same entries as earlier, plus
+    "sebs@teadal.eu": [
+        { "methods": ["GET"], "url_regex": "^/metrics/.*" }
+    ]
+}
+```
+
 
 ### Formal model
 
