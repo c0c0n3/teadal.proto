@@ -313,15 +313,68 @@ all) roles are managed in the IdM, then:
   roles from the access token.
 
 In this setup, `authnz` merges any roles extracted from the token
-with the roles defined for that user in Rego. More precisely, let
-`R(u)` be the set of roles for a given user `u`, as defined in the
-`user_to_roles` map within the Rego policy. If `user_to_roles` is
-not defined, or it contains no entry for user `u`, then `R(u)` is
-the empty set. Similarly, let `T(u)` be the set of roles found in
-the access token issued to user `u`. If the token includes no roles,
-then `T(u)` is also the empty set. The set of roles that `authnz`
-uses to evaluate the policy for user `u` is the union of these two
-sets: `R(u) ∪ T(u)`.
+with the roles defined for that user in Rego.
+
+#### Formal model
+We present a simple mathematical model of the RBAC framework. This
+model succinctly and accurately captures how `authnz` handles authentication
+and authorisation using basic set theory and functions. More sophisticated
+and elegant models—such as relation composition, the power-set monad
+with Kleisli composition—could express the same ideas more concisely.
+However, while arguably more powerful, such constructions are likely
+less familiar to most software developers.
+
+We model how `authnz` maps users to roles using a mathematical function.
+Let `R : User ⟶ 𝒫(Role)` be the function that maps a user to a set
+of roles, where both users and roles are uniquely identified by text
+labels. For each user `u`, define `D(u)` as the set of roles assigned
+to `u` in the `user_to_roles` mapping from the RBAC DB. If `user_to_roles`
+is undefined, or contains no entry for `u`, then `D(u)` is the empty
+set `∅`. Similarly, let `T(u)` be the set of roles found in the access
+token issued to `u`. If no roles are present in the token, then `T(u) = ∅`.
+The set of roles that `authnz` uses to evaluate the policy for user
+`u` is the union of these sets and the user identifier as a singleton
+role: `R(u) = D(u) ∪ T(u) ∪ {u}`. As noted earlier, `authnz` identifies
+each user `u` with a role named `u`, consisting only of `u` as its member.
+In other words, for each user `u`, `u ∈ R(u)`.
+
+Similarly, we define a function to model how `authnz` determines the
+permissions associated with a user. This corresponds to the set of
+all permissions linked to the user, via roles, in the RBAC database.
+Specifically, the `role_to_perms` mapping in the RBAC DB can be viewed
+as a function that assigns each role `r` a set of permissions `P(r)`,
+so that `role_to_perms(r) = P(r)`. The set of permissions associated
+with a user `u` is then the union of all `P(r)` for `r ∈ R(u)`. Thus,
+we define a function `K : User ⟶ 𝒫(Perm)` by: `K(u) = ⋃ P(r)` where
+`r ∈ R(u)`.
+
+To illustrate how `K` works, consider the following example. A user
+`u1` belongs to roles `r1` and `r2`, so `R(u1) = { r1, r2 }`. Each
+role has the following permissions: `P(r1) = { p1, p2 }` and
+`P(r2) = { p2, p3, p4 }`. Another user, `u2`, belongs to roles `r2`
+and `r3`, with `P(r3) = { p5 }`. The relationships can be visualized
+as a directed graph, where arrows represent mappings from users to
+roles (`R`) and from roles to permissions (`P`):
+
+```
+                       u1     u2
+       R ↓            ↙  ↘   ↙  ↘       __.
+                    r1    r2     r3       |
+       P ↓         ↙ ↘  ↙ ↙ ↘    ↓        |___ role_to_perms
+                  p1  p2 p3  p4  p5       |
+                                        __|
+```
+
+The set of permissions associated with `u1` is the set of permission
+nodes reachable via a directed path from `u1`, namely `{ p1, p2, p3, p4 }`.
+Similarly, `u2` is associated with `{ p2, p3, p4, p5 }`.
+
+With `K` defined, we can now describe how `authnz` makes policy decisions.
+We model permissions as predicates over HTTP requests, that is, functions
+of the form `p : Req ⟶ Bool`. Then, `authnz` authorises an incoming HTTP
+request `req` if and only if the following two conditions are satisfied:
+- `req` contains a valid JWT token for user `u`;
+- there exists a permission `p ∈ K(u)` such that `p(req) = true`.
 
 
 ### Alternative policy decision points
