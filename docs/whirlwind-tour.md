@@ -255,9 +255,9 @@ the requests below which return `403` for `jeejee@teadal.eu` and
 `200` for `sebs@teadal.eu`.
 
 ```bash
-$ curl -i -X GET localhost/httpbin/ip \
+$ curl -i -X GET localhost/httpbin/uuid \
        -H "Authorization: Bearer ${jeejees_token}"
-$ curl -i -X GET localhost/httpbin/ip \
+$ curl -i -X GET localhost/httpbin/uuid \
        -H "Authorization: Bearer ${sebs_token}"
 ```
 
