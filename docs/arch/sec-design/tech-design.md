@@ -14,10 +14,14 @@ for evaluation against consumer requests to perform operations on
 data products.
 
 This section delves into the technical design and technology stack
-adopted to realise the aforementioned conceptual architecture. Note
-that the Teadal security implementation embraces Open Source: all
-the technology stack components, both third-party and Teadal's own,
-are open-source.
+adopted to realise the aforementioned conceptual architecture. A
+[separate section][rbac] is devoted to Teadal's built-in Role-Based
+Access Control (RBAC) framework which can be used to write security
+policies for the policy decision point component to evaluate.
+
+Note that the Teadal security implementation embraces Open Source:
+all the technology stack components, both third-party and Teadal's
+own, are open-source.
 
 
 ### Message interception and access control delegation
@@ -145,185 +149,6 @@ the consumer and produces the same response it would if the proxy
 did not intercept the incoming request.
 
 
-### RBAC framework
-
-While the machinery described so far can be used to enforce any kind
-of access control, Teadal also provides a built-in Role-Based Access
-Control (RBAC) framework. This framework dramatically reduces the
-effort needed to implement access control for RESTful services, while
-still leaving policy writers the freedom to extend the base framework
-with service-specific functionality.
-
-Data lake users are managed through a federated, [OIDC][oidc]-compliant
-identity management (IdM) service. Consumer services act on behalf
-of users who have proved their identity through IdM-configured procedures
-such as credential challenges, multi-factor authentication, etc. Upon
-successful authentication, the IdM issues an identity token, more
-specifically a [JSON Web Token][jwt] (JWT), which certifies the user's
-identity. Consumer services attach the token to each data product
-service request by means of the [Bearer][bearer] HTTP Authorization
-header. Presently, Teadal deploys [Keycloak][keycloak] as an IdM service,
-although any other OIDC-compliant software could be used too as the
-RBAC framework only requires OIDC-compliancy, making no assumption
-about the actual IdM implementation.
-
-RBAC roles, users and policy rules are written in plain Rego. Thus,
-policy writers are empowered with a fully-fledged programming language
-which they can exploit to customise, abstract and reuse their roles
-and policies to an extent that is simply not possible with traditional,
-configuration-based, cloud Identity and Access Management solutions.
-Moreover, policy writers can implement automated Rego tests to verify
-their policies have the desired effect when evaluated or even do that
-interactively, for rapid prototyping, as the OPA runtime has both
-test and read-eval-print loop (REPL) facilities. Extensive, automated
-tests also prevent regression issues where modifying a rule may have
-an unforeseen, unwanted side-effect, possibly leading to a security
-incident. Again, this level of sophistication is extremely expensive,
-in terms of required effort, to attain with traditional Identity and
-Access Management solutions.
-
-The Teadal `authnz` Rego library is a good case in point. Policy
-writers import this library in their code to automatically handle
-the evaluation of RBAC rules, user authentication, JWT validation,
-OIDC discovery as well as cryptographic keys download, verification
-and caching. The library allows policy writers to concentrate on
-defining their own, service-specific access control rules using an
-intuitive format.
-
-By way of example, consider securing a simple FDP. The REST service
-exposes patient records as Web resources. There are three paths:
-`/patients` to list and add patients, `/patients/id/` to retrieve
-and delete a particular patient, and `/patients/age` to retrieve
-a list with the ID and age of each patient but nothing else. Also,
-there is a `/status` path which returns the current service status.
-We would like to define two roles. A product owner, which should
-be able to perform a `GET`, `POST` and `DELETE` on any URL path
-starting with `/patients`, and a product consumer, which should
-only be allowed to `GET` patient ages and service status. Moreover,
-we would like to assign both the product owner and consumer roles
-to the user identified by the email of `jeejee@teadal.eu` whereas
-just the product consumer role to the user identified by the email
-of `sebs@teadal.eu`. In the Teadal RBAC framework, all of the above
-can be accomplished with the following Rego code.
-
-```rego
-# Role defs.
-product_owner := "product_owner"
-product_consumer := "product_consumer"
-
-# Map each role to a list of permission objects.
-# Each permission object specifies a set of allowed HTTP methods for
-# the Web resources identified by the URLs matching the given regex.
-role_to_perms := {
-    product_owner: [
-        {
-            "methods": [ "GET", "POST", "DELETE" ],
-            "url_regex": "^/patients/.*"
-        }
-    ],
-    product_consumer: [
-        {
-            "methods": [ "GET" ],
-            "url_regex": "^/patients/age$"
-        },
-        {
-            "methods": [ "GET" ],
-            "url_regex": "^/status$"
-        }
-    ]
-}
-
-# Map each user to their roles.
-user_to_roles := {
-    "jeejee@teadal.eu": [ product_owner, product_consumer ],
-    "sebs@teadal.eu": [ product_consumer ]
-}
-```
-
-To evaluate our RBAC rules against the request received from Envoy,
-we would simply import the Teadal `authnz` library and call its
-`allow` function as exemplified by the Rego code snippet below,
-where we tacitly assume the RBAC rules defined earlier are in
-a package imported as `rbac_db`.
-
-```rego
-default allow := false
-
-allow = true {
-    # Use the `allow` function from `authnz.envopa` to check our RBAC
-    # rules against the HTTP request received from Envoy. The function
-    # returns the user extracted from the JWT if the check is successful.
-    user := envopa.allow(rbac_db)
-
-    # Put below this line any service-specific checks on e.g. the
-    # HTTP request received from Envoy.
-}
-```
-
-As already mentioned, `authnz` automatically handles the evaluation
-of RBAC rules, user authentication, JWT validation, OIDC discovery
-as well as cryptographic keys download, verification and caching.
-Also of note, `authnz` provides built-in functions to evaluate
-user-defined RBAC rules interactively in the Rego REPL. This is
-useful for dry-run scenarios where a policy writer may want to see
-what is the effect of their RBAC rules before deploying them to the
-data lake.
-
-#### Mapping users to roles
-In the previous example, roles were defined in Rego along with the
-mapping of users to roles. It is also possible to define roles in
-the IdM where users are kept and use the IdM's tools to associate
-users to roles. In this case, the Rego policy would only contain the
-`role_to_perms` map associating each role defined in the IdM to a
-list of permission objects as shown in the example below.
-
-```rego
-role_to_perms := {
-    "product_owner": [
-        {
-            "methods": [ "GET", "POST", "DELETE" ],
-            "url_regex": "^/patients/.*"
-        }
-    ],
-    "product_consumer": [
-        {
-            "methods": [ "GET" ],
-            "url_regex": "^/patients/age$"
-        },
-        {
-            "methods": [ "GET" ],
-            "url_regex": "^/status$"
-        }
-    ]
-}
-```
-
-This Rego code defines a policy that has the same effect as that
-presented earlier where users were explicitly associated to roles
-through the `user_to_roles` map.
-
-A mixed scenario is also possible, where some roles are defined in
-the IdM and others in Rego policies—the [Whirlwind Tour][wt] section
-provides an example of this. Regardless of the approach, if some (or
-all) roles are managed in the IdM, then:
-- the IdM must generate access tokens that include not only the
-  authenticated user's ID, but also a list of roles the user
-  belongs to; and
-- `authnz` must be configured to read both the user ID and the
-  roles from the access token.
-
-In this setup, `authnz` merges any roles extracted from the token
-with the roles defined for that user in Rego. More precisely, let
-`R(u)` be the set of roles for a given user `u`, as defined in the
-`user_to_roles` map within the Rego policy. If `user_to_roles` is
-not defined, or it contains no entry for user `u`, then `R(u)` is
-the empty set. Similarly, let `T(u)` be the set of roles found in
-the access token issued to user `u`. If the token includes no roles,
-then `T(u)` is also the empty set. The set of roles that `authnz`
-uses to evaluate the policy for user `u` is the union of these two
-sets: `R(u) ∪ T(u)`.
-
-
 ### Alternative policy decision points
 
 The Envoy External Authorization Filter can be connected to any gRPC
@@ -359,21 +184,17 @@ policies to the plug-in at regular intervals.
 
 
 [anubis]: https://github.com/orchestracities/anubis
-[bearer]: https://datatracker.ietf.org/doc/html/rfc6750
 [concept]: ./concept.md
 [envoy]: https://www.envoyproxy.io/
 [ext-authz]: https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter
 [fiware]: https://www.fiware.org/
 [grpc]: https://en.wikipedia.org/wiki/GRPC
 [istio-arch]: https://istio.io/latest/docs/ops/deployment/architecture/
-[keycloak]: https://www.keycloak.org/
-[jwt]: https://datatracker.ietf.org/doc/html/rfc7519
 [long-poll]: https://datatracker.ietf.org/doc/html/rfc6202
-[oidc]: https://openid.net/developers/how-connect-works/
 [opa]: https://www.openpolicyagent.org/
 [opa-envoy]: https://github.com/open-policy-agent/opa-envoy-plugin
 [protobuf]: https://en.wikipedia.org/wiki/Protocol_Buffers
+[rbac]: ./rbac.md
 [security-overview.dia]: ./istio-opa-security.svg
 [souffle]: https://souffle-lang.github.io/
 [wac]: https://solid.github.io/web-access-control-spec/
-[wt]: ../../whirlwind-tour.md#security

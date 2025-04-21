@@ -124,6 +124,12 @@ test_user_perms_with_ext_role_defs if {
             "url_regex": "^/httpbin/get$"
         }
     }
+    user_perms(ext_rbac_db, "", ["sebs"]) == {
+        {
+            "methods": http.read,
+            "url_regex": "^/httpbin/ip$"
+        }
+    }
     user_perms(ext_rbac_db, "", []) ==
         { 1 | 1 == 0 }
     #   ^ empty set; sadly, {} is an empty object to Rego!
@@ -158,4 +164,17 @@ test_check_perms if {
     assert_user_can_only_read_path("sebs", "/httpbin/anything/")
     assert_user_can_only_read_path("jeejee", "/httpbin/get")
     assert_user_can_only_read_path("sebs", "/httpbin/get")
+}
+
+assert_user_can_read_path_ext_db(user, roles, path) if {
+    check(ext_rbac_db, user, roles, {"method": "GET", "path": path})
+}
+
+test_check_perms_ext_db if {
+    assert_user_can_read_path_ext_db("sebs", [], "/httpbin/ip")
+    assert_user_can_read_path_ext_db(
+        "sebs", ["product_consumer"], "/httpbin/ip")
+    not assert_user_can_read_path_ext_db("sebs", [], "/httpbin/get")
+    assert_user_can_read_path_ext_db(
+        "sebs", ["product_consumer"], "/httpbin/get")
 }

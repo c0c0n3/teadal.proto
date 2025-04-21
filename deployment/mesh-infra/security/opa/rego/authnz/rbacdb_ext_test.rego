@@ -34,5 +34,16 @@ role_to_perms := {
             "methods": http.read,
             "url_regex": "^/httpbin/get$"
         }
+    ],
+    # We'd also like user "sebs" to be able to get the IP address.
+    # So we use implicit roles to define an extra perm just for role
+    # "sebs". (With implicit roles each user gets automatically
+    # associated with a role having the same name as the user and
+    # that contains only that user as its member.)
+    "sebs": [
+        {
+            "methods": http.read,
+            "url_regex": "^/httpbin/ip$"
+        }
     ]
 }
