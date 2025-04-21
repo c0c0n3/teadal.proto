@@ -41,20 +41,34 @@ role_to_perms := {
             "url_regex": "^/httpbin/ip$"
         }
     ],
-    # We'd also like user "sebs@teadal.eu" to be able to get the IP
-    # address. But "sebs@teadal.eu" isn't a member of monitor and he
-    # shouldn't be since policies for other services could use that
-    # role to grant an access level "sebs@teadal.eu" shouldn't have.
-    # So we use implicit roles to define an extra perm just for role
-    # "sebs@teadal.eu". (With implicit roles each user gets automatically
-    # associated with a role having the same name as the user and that
-    # contains only that user as its member.)
+    # No one except for user "sebs@teadal.eu" should be able to GET
+    # UUIDs. But there's no UUID reader role in the IdM and we don't
+    # want to create one just for "sebs@teadal.eu". So we use RBAC
+    # implicit roles to define this perm just for role "sebs@teadal.eu".
+    # (With implicit roles each user gets automatically associated
+    # with a role having the same name as the user and that contains
+    # only that user as its member.)
     "sebs@teadal.eu": [
         {
             "methods": http.read,
-            "url_regex": "^/httpbin/ip$"
+            "url_regex": "^/httpbin/uuid$"
         }
     ]
+    # Implicit roles also come in handy when you want to make an
+    # exception to the rule (or role, rather :-) for a specific
+    # user. For example, say we'd also like user "sebs@teadal.eu"
+    # to be able to get the IP address. But "sebs@teadal.eu" isn't
+    # a member of monitor and he shouldn't be since policies for
+    # other services could use that role to grant an access level
+    # "sebs@teadal.eu" shouldn't have. So we use implicit roles to
+    # define an extra perm just for role "sebs@teadal.eu" as in the
+    # example below.
+    # "sebs@teadal.eu": [
+    #     {
+    #         "methods": http.read,
+    #         "url_regex": "^/httpbin/ip$"
+    #     }
+    # ]
 }
 
 # Map each user to their roles.

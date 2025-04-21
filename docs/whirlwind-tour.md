@@ -145,7 +145,7 @@ exactly straightforward, so to make sense of the examples below you
 should probably first read about [our security architecture][sec],
 at least the conceptual model section.
 
-We'll use HttbBin to simulate a data product. There's a [policy][httpbin-rbac]
+We'll use HttpBin to simulate a data product. There's a [policy][httpbin-rbac]
 that defines two roles:
 - *Product owner*. The owner may do any kind of HTTP request to URLs
    starting with `/httpbin/anything/`.
@@ -237,10 +237,22 @@ $ curl -i -X GET localhost/httpbin/get \
        -H "Authorization: Bearer ${sebs_token}"
 ```
 
-You should see a `200` response in both cases. Finally, members of
-the `monitor` group should be allowed to `GET /httpbin/ip`. Since
+You should see a `200` response in both cases. Now, members of the
+`monitor` group should be allowed to `GET /httpbin/ip`. Since
 `jeejee@teadal.eu` is a member and `sebs@teadal.eu` is not, the below
 requests should return `200` and `403`, respectively.
+
+```bash
+$ curl -i -X GET localhost/httpbin/ip \
+       -H "Authorization: Bearer ${jeejees_token}"
+$ curl -i -X GET localhost/httpbin/ip \
+       -H "Authorization: Bearer ${sebs_token}"
+```
+
+Finally, `sebs@teadal.eu`, but no one else, should be allowed to
+`GET /httpbin/uuid`. In fact, this is the case as you can see from
+the requests below which return `403` for `jeejee@teadal.eu` and
+`200` for `sebs@teadal.eu`.
 
 ```bash
 $ curl -i -X GET localhost/httpbin/ip \
