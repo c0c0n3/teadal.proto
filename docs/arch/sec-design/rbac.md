@@ -273,7 +273,7 @@ roles (`R`) and from roles to permissions (`P`):
 
 ```
                        u1     u2
-       R ↓            ↙  ↘   ↙  ↘       __.
+       R ↓            ↙  ↘   ↙  ↘       __
                     r1    r2     r3       |
        P ↓         ↙ ↘  ↙ ↙ ↘    ↓        |___ role_to_perms
                   p1  p2 p3  p4  p5       |
