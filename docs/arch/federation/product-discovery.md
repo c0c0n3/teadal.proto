@@ -32,4 +32,4 @@ reference both FDP#1 and FDP#2.
 
 
 
-[discovery.dia]: ./3.product-discovery.png
+[discovery.dia]: ./product-discovery.png

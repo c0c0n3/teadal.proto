@@ -36,4 +36,4 @@ transaction:
 
 
 
-[sharing.dia]: ./2.data-sharing.png
+[sharing.dia]: ./data-sharing.png
