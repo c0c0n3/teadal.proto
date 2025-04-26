@@ -33,14 +33,17 @@ enabling data sharing within the federation.
 
 ### Interaction patterns
 
-The Teadal architecture enables several interaction patterns among
-federation sites (Teadal nodes). This section provides a bird's eye
-view of each pattern, focussing on the interactions between Teadal
-nodes and disregarding the complex interactions among components
-within each node. Please take heed: what follows is a description
-of the kind of inter-node interactions which the Teadal architecture
-has been designed to support. Some patterns are currently observed
-in field trials, while others remain potential possibilities.
+The Teadal architecture supports several interaction patterns among
+federation sites (Teadal nodes). This section provides an overview
+of each pattern, focusing on interactions among Teadal nodes, and
+excluding the more complex interactions within individual nodes.
+Note that the following description outlines the types of inter-node
+interactions which the Teadal architecture is designed to support.
+Some of these patterns are already being tested in field trials,
+while others are still potential possibilities. In other words,
+this section describes the intended capabilities of the Teadal
+design, rather than the specific features currently implemented
+in the field trials.
 
 - [Data product sharing][fdp]
 - [Product discovery][catalogue]
