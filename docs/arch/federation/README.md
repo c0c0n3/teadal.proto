@@ -31,6 +31,29 @@ enabling data sharing within the federation.
 ![Teadal federation concept.][fed.dia]
 
 
+### Interaction patterns
+
+The Teadal architecture enables several interaction patterns among
+federation sites (Teadal nodes). This section provides a bird's eye
+view of each pattern, focussing on the interactions between Teadal
+nodes and disregarding the complex interactions among components
+within each node. Please take heed: what follows is a description
+of the kind of inter-node interactions which the Teadal architecture
+has been designed to support. Some patterns are currently observed
+in field trials, while others remain potential possibilities.
+
+- [Data product sharing][fdp]
+- [Product discovery][catalogue]
+- [Identity federation][idm]
+- [Trust][trust]
+- [Resource allocation][ra]
 
 
+
+
+[catalogue]: ./product-discovery.md
+[fdp]: ./data-sharing.md
 [fed.dia]: ./federation.png
+[idm]: ./identity-federation.md
+[ra]: ./respource-allocation.md
+[trust]: ./trust.md
