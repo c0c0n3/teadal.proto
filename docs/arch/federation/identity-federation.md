@@ -41,6 +41,19 @@ This method of federating user identities offers several benefits:
   own user directory, while still being able to federate identities
   with other nodes as needed.
 
+As an example, consider two Teadal nodes: node A and node B. Each
+node runs its own Keycloak instance for managing users. IdM#1, the
+Keycloak instance in node A, holds user#1 and user#2, while IdM#2,
+the Keycloak in node B, holds user#3 and user#4. To enable collaboration
+between these nodes, IdM#1 can be configured as the identity provider
+(IdP) for node B. Using the OIDC protocol, IdM#2 (acting as the service
+provider, or SP) can request user identities from IdM#1 whenever an
+authenticated user needs access to resources in node B. As a result,
+user#1 and user#2 become available to IdM#2, and thus to the policy
+framework software running in node B. This identity federation allows
+for seamless, secure data sharing between the two nodes without the
+need for redundant user management.
+
 ![Identity federation between two Teadal nodes.][idm.dia]
 
 
