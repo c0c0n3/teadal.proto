@@ -39,6 +39,8 @@ Here's some initial dev notes to explain part of what's been done.
   the hardware and software to run an instance of a Teadal data lake.
 - [Security][sec]. Design and implementation of the security architecture,
   with a focus on securing data products.
+- [Federation][fed]. Data sharing among organisations in a federation
+  and interaction patterns among federation sites.
 
 
 
@@ -47,6 +49,7 @@ Here's some initial dev notes to explain part of what's been done.
 [bootstrap]: ./bootstrap/README.md
 [demo]: ./whirlwind-tour.md
 [dev-env]: ./dev-env.md
+[fed]: ./arch/federation/README.md
 [os-depl]: ./os-deployment.md
 [qemu]: ./qemu.md
 [runtime]: ./arch/runtime/README.md
